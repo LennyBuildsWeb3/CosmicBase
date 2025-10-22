@@ -1,0 +1,28 @@
+{
+  "name": "cosmicbase",
+  "version": "1.0.0",
+  "description": "CosmicBase - Onchain Astrology Profile Platform on Base",
+  "private": true,
+  "workspaces": [
+    "contracts",
+    "frontend"
+  ],
+  "scripts": {
+    "contracts": "npm run --workspace=contracts",
+    "frontend": "npm run dev --workspace=frontend",
+    "dev": "npm run frontend",
+    "build:contracts": "npm run compile --workspace=contracts",
+    "test:contracts": "npm run test --workspace=contracts",
+    "deploy:testnet": "npm run deploy:sepolia --workspace=contracts"
+  },
+  "keywords": [
+    "astrology",
+    "blockchain",
+    "base",
+    "nft",
+    "birth-chart",
+    "web3"
+  ],
+  "author": "",
+  "license": "MIT"
+}
