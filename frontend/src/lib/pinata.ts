@@ -3,8 +3,6 @@
  * Functions for uploading birth chart metadata to IPFS
  */
 
-import { PinataSDK } from "pinata"
-
 export interface BirthChartMetadata {
   name: string
   description: string
@@ -23,41 +21,39 @@ export interface BirthChartMetadata {
 }
 
 /**
- * Initialize Pinata client
+ * Upload JSON metadata to Pinata IPFS using REST API
  */
-function getPinataClient() {
+export async function uploadToPinata(metadata: BirthChartMetadata): Promise<string> {
   const jwt = process.env.NEXT_PUBLIC_PINATA_JWT
 
   if (!jwt) {
     throw new Error('Pinata JWT not configured')
   }
 
-  return new PinataSDK({
-    pinataJwt: jwt
-  })
-}
-
-/**
- * Upload JSON metadata to Pinata IPFS
- */
-export async function uploadToPinata(metadata: BirthChartMetadata): Promise<string> {
   try {
-    const pinata = getPinataClient()
-
-    const upload = await pinata.upload.json(metadata, {
-      metadata: {
-        name: `CosmicBase-${Date.now()}.json`,
-        keyvalues: {
-          type: 'birth-chart',
-          sunSign: metadata.birthChart.sunSign,
-          moonSign: metadata.birthChart.moonSign,
-          risingSign: metadata.birthChart.risingSign
+    const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwt}`
+      },
+      body: JSON.stringify({
+        pinataContent: metadata,
+        pinataMetadata: {
+          name: `CosmicBase-${Date.now()}.json`
         }
-      }
+      })
     })
 
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Pinata upload failed: ${errorText}`)
+    }
+
+    const data = await response.json()
+
     // Return IPFS URI
-    return `ipfs://${upload.IpfsHash}`
+    return `ipfs://${data.IpfsHash}`
   } catch (error) {
     console.error('Pinata upload error:', error)
     throw error
@@ -65,23 +61,41 @@ export async function uploadToPinata(metadata: BirthChartMetadata): Promise<stri
 }
 
 /**
- * Upload file to Pinata IPFS
+ * Upload file to Pinata IPFS using REST API
  */
 export async function uploadFileToPinata(file: File): Promise<string> {
-  try {
-    const pinata = getPinataClient()
+  const jwt = process.env.NEXT_PUBLIC_PINATA_JWT
 
-    const upload = await pinata.upload.file(file, {
-      metadata: {
-        name: file.name,
-        keyvalues: {
-          type: 'chart-image'
-        }
-      }
+  if (!jwt) {
+    throw new Error('Pinata JWT not configured')
+  }
+
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const metadata = JSON.stringify({
+      name: file.name
+    })
+    formData.append('pinataMetadata', metadata)
+
+    const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${jwt}`
+      },
+      body: formData
     })
 
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Pinata file upload failed: ${errorText}`)
+    }
+
+    const data = await response.json()
+
     // Return IPFS URI
-    return `ipfs://${upload.IpfsHash}`
+    return `ipfs://${data.IpfsHash}`
   } catch (error) {
     console.error('Pinata file upload error:', error)
     throw error
