@@ -3,6 +3,8 @@
  * Functions for uploading birth chart metadata to IPFS
  */
 
+import { PinataSDK } from "pinata"
+
 export interface BirthChartMetadata {
   name: string
   description: string
@@ -21,43 +23,67 @@ export interface BirthChartMetadata {
 }
 
 /**
+ * Initialize Pinata client
+ */
+function getPinataClient() {
+  const jwt = process.env.NEXT_PUBLIC_PINATA_JWT
+
+  if (!jwt) {
+    throw new Error('Pinata JWT not configured')
+  }
+
+  return new PinataSDK({
+    pinataJwt: jwt
+  })
+}
+
+/**
  * Upload JSON metadata to Pinata IPFS
  */
 export async function uploadToPinata(metadata: BirthChartMetadata): Promise<string> {
-  const apiKey = process.env.NEXT_PUBLIC_PINATA_API_KEY
-  const secretKey = process.env.PINATA_SECRET_KEY
-
-  if (!apiKey || !secretKey) {
-    throw new Error('Pinata API keys not configured')
-  }
-
   try {
-    const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'pinata_api_key': apiKey,
-        'pinata_secret_api_key': secretKey
-      },
-      body: JSON.stringify({
-        pinataContent: metadata,
-        pinataMetadata: {
-          name: `CosmicBase-${Date.now()}.json`
+    const pinata = getPinataClient()
+
+    const upload = await pinata.upload.json(metadata, {
+      metadata: {
+        name: `CosmicBase-${Date.now()}.json`,
+        keyvalues: {
+          type: 'birth-chart',
+          sunSign: metadata.birthChart.sunSign,
+          moonSign: metadata.birthChart.moonSign,
+          risingSign: metadata.birthChart.risingSign
         }
-      })
+      }
     })
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`Pinata upload failed: ${errorText}`)
-    }
-
-    const data = await response.json()
-
     // Return IPFS URI
-    return `ipfs://${data.IpfsHash}`
+    return `ipfs://${upload.IpfsHash}`
   } catch (error) {
     console.error('Pinata upload error:', error)
+    throw error
+  }
+}
+
+/**
+ * Upload file to Pinata IPFS
+ */
+export async function uploadFileToPinata(file: File): Promise<string> {
+  try {
+    const pinata = getPinataClient()
+
+    const upload = await pinata.upload.file(file, {
+      metadata: {
+        name: file.name,
+        keyvalues: {
+          type: 'chart-image'
+        }
+      }
+    })
+
+    // Return IPFS URI
+    return `ipfs://${upload.IpfsHash}`
+  } catch (error) {
+    console.error('Pinata file upload error:', error)
     throw error
   }
 }
@@ -66,9 +92,11 @@ export async function uploadToPinata(metadata: BirthChartMetadata): Promise<stri
  * Get IPFS gateway URL from IPFS URI
  */
 export function getIPFSUrl(ipfsUri: string): string {
+  const gateway = process.env.NEXT_PUBLIC_PINATA_GATEWAY || 'https://gateway.pinata.cloud'
+
   if (ipfsUri.startsWith('ipfs://')) {
     const hash = ipfsUri.replace('ipfs://', '')
-    return `https://gateway.pinata.cloud/ipfs/${hash}`
+    return `${gateway}/ipfs/${hash}`
   }
   return ipfsUri
 }
