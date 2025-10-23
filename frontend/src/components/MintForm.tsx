@@ -1,10 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { CONTRACT_ADDRESS, CONTRACT_ABI, ZODIAC_SIGNS } from '@/config/contract'
 import { BirthData, calculateBirthChart, validateBirthData, getSignName, getSignEmoji } from '@/lib/astrology'
-import { uploadToPinata, generateChartImageUrl, BirthChartMetadata } from '@/lib/pinata'
+import { uploadToPinata, uploadBlobToPinata, getIPFSUrl, BirthChartMetadata } from '@/lib/pinata'
+import { ChartCustomization } from '@/types/customization'
+import { CustomizationPanel } from './chart/CustomizationPanel'
+import { NatalChartSVG } from './chart/NatalChartSVG'
+import { svgToBlob } from '@/lib/chartImage'
 
 export function MintForm() {
   const { address, isConnected } = useAccount()
@@ -33,6 +37,14 @@ export function MintForm() {
   const [locationFound, setLocationFound] = useState(false)
   const [calculatedChart, setCalculatedChart] = useState<any>(null)
   const [formError, setFormError] = useState<string>('')
+  const [customization, setCustomization] = useState<ChartCustomization>({
+    displayName: '',
+    colorTheme: 'cosmic-purple',
+    chartStyle: 'modern',
+    zodiacArtStyle: 'detailed'
+  })
+  const [showPreview, setShowPreview] = useState(false)
+  const chartSvgRef = useRef<SVGSVGElement>(null)
 
   // Geocode city name to coordinates
   const handleCitySearch = async () => {
@@ -102,23 +114,51 @@ export function MintForm() {
       const chart = calculateBirthChart(formData)
       setCalculatedChart(chart)
 
-      // Step 2: Upload to IPFS
+      // Step 2: Generate and upload chart image
       setStep('uploading')
+
+      // Wait a bit to ensure SVG is rendered
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      let imageUri = ''
+      if (chartSvgRef.current) {
+        try {
+          // Convert SVG to PNG blob
+          const blob = await svgToBlob(chartSvgRef.current)
+
+          // Upload image to IPFS
+          imageUri = await uploadBlobToPinata(
+            blob,
+            `cosmicbase-chart-${address.slice(0, 6)}.png`
+          )
+          console.log('Chart image uploaded to IPFS:', imageUri)
+        } catch (imgError) {
+          console.error('Failed to generate/upload chart image:', imgError)
+          // Continue with placeholder if image generation fails
+        }
+      }
+
+      // Step 3: Upload metadata to IPFS
+      const displayName = customization.displayName || address.slice(0, 8)
       const metadata: BirthChartMetadata = {
-        name: `CosmicBase Birth Chart #${address.slice(0, 6)}`,
+        name: `CosmicBase Birth Chart - ${displayName}`,
         description: `Birth chart for ${getSignName(chart.sunSign)} Sun, ${getSignName(chart.moonSign)} Moon, ${getSignName(chart.risingSign)} Rising`,
-        image: generateChartImageUrl(
-          getSignName(chart.sunSign),
-          getSignName(chart.moonSign),
-          getSignName(chart.risingSign)
-        ),
+        image: imageUri ? getIPFSUrl(imageUri) : `https://api.dicebear.com/7.x/shapes/svg?seed=${chart.sunSign}-${chart.moonSign}-${chart.risingSign}`,
         attributes: [
           { trait_type: 'Sun Sign', value: getSignName(chart.sunSign) },
           { trait_type: 'Moon Sign', value: getSignName(chart.moonSign) },
           { trait_type: 'Rising Sign', value: getSignName(chart.risingSign) },
-          { trait_type: 'Birth Year', value: formData.year }
+          { trait_type: 'Birth Year', value: formData.year },
+          { trait_type: 'Color Theme', value: customization.colorTheme },
+          { trait_type: 'Chart Style', value: customization.chartStyle }
         ],
-        birthChart: chart.fullChart
+        birthChart: chart.fullChart,
+        customization: {
+          displayName: customization.displayName,
+          colorTheme: customization.colorTheme,
+          chartStyle: customization.chartStyle,
+          zodiacArtStyle: customization.zodiacArtStyle
+        }
       }
 
       const ipfsUri = await uploadToPinata(metadata)
@@ -311,6 +351,56 @@ export function MintForm() {
             Enter your birth city and country for accurate coordinates
           </p>
         </div>
+
+        {/* Customization Section */}
+        <div className="border-t border-purple-500/20 pt-6">
+          <CustomizationPanel
+            customization={customization}
+            onChange={setCustomization}
+          />
+        </div>
+
+        {/* Preview Button */}
+        {calculatedChart && (
+          <button
+            type="button"
+            onClick={() => setShowPreview(!showPreview)}
+            className="w-full px-6 py-3 bg-white/5 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+          >
+            {showPreview ? '🙈 Hide Preview' : '👁️ Preview Chart'}
+          </button>
+        )}
+
+        {/* Chart Preview */}
+        {showPreview && calculatedChart && (
+          <div className="p-6 bg-white/5 rounded-xl border border-purple-500/20">
+            <div className="flex justify-center">
+              <div style={{ width: '400px', height: '400px' }}>
+                <NatalChartSVG
+                  sunSign={getSignName(calculatedChart.sunSign)}
+                  moonSign={getSignName(calculatedChart.moonSign)}
+                  risingSign={getSignName(calculatedChart.risingSign)}
+                  customization={customization}
+                  planets={calculatedChart.fullChart?.CelestialBodies}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Hidden SVG for image generation */}
+        {calculatedChart && (
+          <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+            <NatalChartSVG
+              ref={chartSvgRef}
+              sunSign={getSignName(calculatedChart.sunSign)}
+              moonSign={getSignName(calculatedChart.moonSign)}
+              risingSign={getSignName(calculatedChart.risingSign)}
+              customization={customization}
+              planets={calculatedChart.fullChart?.CelestialBodies}
+            />
+          </div>
+        )}
 
         {/* Error Display */}
         {formError && (

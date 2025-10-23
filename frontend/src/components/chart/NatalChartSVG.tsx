@@ -1,5 +1,6 @@
 'use client'
 
+import { forwardRef } from 'react'
 import { ChartCustomization, COLOR_THEMES } from '@/types/customization'
 
 interface NatalChartSVGProps {
@@ -10,13 +11,13 @@ interface NatalChartSVGProps {
   planets?: Record<string, any>
 }
 
-export function NatalChartSVG({
+export const NatalChartSVG = forwardRef<SVGSVGElement, NatalChartSVGProps>(({
   sunSign,
   moonSign,
   risingSign,
   customization,
   planets
-}: NatalChartSVGProps) {
+}, ref) => {
   const theme = COLOR_THEMES[customization.colorTheme]
   const size = 800
   const center = size / 2
@@ -68,6 +69,7 @@ export function NatalChartSVG({
 
   return (
     <svg
+      ref={ref}
       width={size}
       height={size}
       viewBox={`0 0 ${size} ${size}`}
@@ -283,4 +285,6 @@ export function NatalChartSVG({
       </text>
     </svg>
   )
-}
+})
+
+NatalChartSVG.displayName = 'NatalChartSVG'

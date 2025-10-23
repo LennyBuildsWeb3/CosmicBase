@@ -18,6 +18,12 @@ export interface BirthChartMetadata {
     planets: Record<string, any>
     houses: Record<string, any>
   }
+  customization?: {
+    displayName: string
+    colorTheme: string
+    chartStyle: string
+    zodiacArtStyle: string
+  }
 }
 
 /**
@@ -100,6 +106,14 @@ export async function uploadFileToPinata(file: File): Promise<string> {
     console.error('Pinata file upload error:', error)
     throw error
   }
+}
+
+/**
+ * Upload blob to Pinata IPFS
+ */
+export async function uploadBlobToPinata(blob: Blob, filename: string): Promise<string> {
+  const file = new File([blob], filename, { type: blob.type })
+  return uploadFileToPinata(file)
 }
 
 /**
