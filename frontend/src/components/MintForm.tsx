@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { CONTRACT_ADDRESS, CONTRACT_ABI, ZODIAC_SIGNS } from '@/config/contract'
 import { BirthData, calculateBirthChart, validateBirthData, getSignName, getSignEmoji } from '@/lib/astrology'
@@ -10,6 +10,13 @@ export function MintForm() {
   const { address, isConnected } = useAccount()
   const { writeContract, data: hash, isPending, error } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
+
+  // Update step when transaction is successful
+  useEffect(() => {
+    if (isSuccess) {
+      setStep('success')
+    }
+  }, [isSuccess])
 
   const [step, setStep] = useState<'form' | 'calculating' | 'uploading' | 'minting' | 'success'>('form')
   const [formData, setFormData] = useState<BirthData>({
@@ -55,7 +62,7 @@ export function MintForm() {
         setFormError('')
         console.log(`Location found: ${display_name} (${lat}, ${lon})`)
       } else {
-        setFormError('Location not found. Please try with city and country (e.g., "Istanbul, Turkey")')
+        setFormError('Location not found. Please try with city and country (e.g., "Paris, France")')
         setLocationFound(false)
       }
     } catch (err) {
@@ -280,7 +287,7 @@ export function MintForm() {
           <div className="flex gap-2">
             <input
               type="text"
-              placeholder="Enter city name (e.g., Istanbul, Turkey)"
+              placeholder="Enter city name (e.g., New York, USA)"
               value={cityName}
               onChange={e => setCityName(e.target.value)}
               onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), handleCitySearch())}

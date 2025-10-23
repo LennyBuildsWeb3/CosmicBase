@@ -1,28 +1,11 @@
 'use client'
 
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { useEffect } from 'react'
 
 export function WalletConnect() {
   const { address, isConnected } = useAccount()
   const { connect, connectors, isPending } = useConnect()
   const { disconnect } = useDisconnect()
-
-  // Auto-connect on mount if previously connected
-  useEffect(() => {
-    const autoConnect = async () => {
-      const connector = connectors.find(c => c.type === 'injected')
-      if (connector && !isConnected) {
-        try {
-          await connect({ connector })
-        } catch (error) {
-          // Silent fail on auto-connect
-          console.log('Auto-connect failed:', error)
-        }
-      }
-    }
-    autoConnect()
-  }, []) // Only run once on mount
 
   const handleConnect = async () => {
     // Try injected (MetaMask) first
