@@ -15,13 +15,6 @@ export function MintForm() {
   const { writeContract, data: hash, isPending, error } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
 
-  // Update step when transaction is successful
-  useEffect(() => {
-    if (isSuccess) {
-      setStep('success')
-    }
-  }, [isSuccess])
-
   const [step, setStep] = useState<'form' | 'calculating' | 'uploading' | 'minting' | 'success'>('form')
   const [formData, setFormData] = useState<BirthData>({
     year: 1990,
@@ -43,8 +36,32 @@ export function MintForm() {
     chartStyle: 'modern',
     zodiacArtStyle: 'detailed'
   })
-  const [showPreview, setShowPreview] = useState(false)
+  const [showCustomization, setShowCustomization] = useState(false)
   const chartSvgRef = useRef<SVGSVGElement>(null)
+
+  // Update step when transaction is successful
+  useEffect(() => {
+    if (isSuccess) {
+      setStep('success')
+    }
+  }, [isSuccess])
+
+  // Auto-calculate chart when birth data is complete
+  useEffect(() => {
+    if (locationFound && formData.year && formData.month && formData.day) {
+      const validationError = validateBirthData(formData)
+      if (!validationError) {
+        try {
+          const chart = calculateBirthChart(formData)
+          setCalculatedChart(chart)
+          setFormError('')
+        } catch (err) {
+          console.error('Chart calculation error:', err)
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.year, formData.month, formData.day, formData.hour, formData.minute, formData.latitude, formData.longitude, locationFound])
 
   // Geocode city name to coordinates
   const handleCitySearch = async () => {
@@ -180,8 +197,22 @@ export function MintForm() {
 
     } catch (err: any) {
       console.error('Mint error:', err)
-      setFormError(err.message || 'Failed to mint birth chart')
+
+      // Always reset to form step first
       setStep('form')
+
+      // Handle user rejection more gracefully
+      const errorMessage = err.message || err.toString() || ''
+
+      if (errorMessage.toLowerCase().includes('user rejected') ||
+          errorMessage.toLowerCase().includes('user denied') ||
+          errorMessage.toLowerCase().includes('user cancelled')) {
+        setFormError('Transaction cancelled')
+      } else if (errorMessage.toLowerCase().includes('insufficient funds')) {
+        setFormError('Insufficient funds')
+      } else {
+        setFormError('Transaction failed. Please try again.')
+      }
     }
   }
 
@@ -352,30 +383,14 @@ export function MintForm() {
           </p>
         </div>
 
-        {/* Customization Section */}
-        <div className="border-t border-purple-500/20 pt-6">
-          <CustomizationPanel
-            customization={customization}
-            onChange={setCustomization}
-          />
-        </div>
-
-        {/* Preview Button */}
+        {/* Chart Preview - Always show when calculated */}
         {calculatedChart && (
-          <button
-            type="button"
-            onClick={() => setShowPreview(!showPreview)}
-            className="w-full px-6 py-3 bg-white/5 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
-          >
-            {showPreview ? '🙈 Hide Preview' : '👁️ Preview Chart'}
-          </button>
-        )}
-
-        {/* Chart Preview */}
-        {showPreview && calculatedChart && (
           <div className="p-6 bg-white/5 rounded-xl border border-purple-500/20">
-            <div className="flex justify-center">
-              <div style={{ width: '400px', height: '400px' }}>
+            <h3 className="text-lg font-semibold mb-4 text-center text-purple-200">
+              Your Birth Chart Preview
+            </h3>
+            <div className="flex justify-center items-center overflow-hidden">
+              <div style={{ width: '400px', height: '400px', maxWidth: '100%' }}>
                 <NatalChartSVG
                   sunSign={getSignName(calculatedChart.sunSign)}
                   moonSign={getSignName(calculatedChart.moonSign)}
@@ -387,6 +402,14 @@ export function MintForm() {
             </div>
           </div>
         )}
+
+        {/* Customization Section */}
+        <div className="border-t border-purple-500/20 pt-6">
+          <CustomizationPanel
+            customization={customization}
+            onChange={setCustomization}
+          />
+        </div>
 
         {/* Hidden SVG for image generation */}
         {calculatedChart && (

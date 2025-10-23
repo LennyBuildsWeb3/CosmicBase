@@ -1,8 +1,13 @@
 'use client'
 
-import { WalletConnect } from '@/components/WalletConnect'
+import dynamic from 'next/dynamic'
 import { MintForm } from '@/components/MintForm'
 import { useAccount } from 'wagmi'
+
+const WalletConnect = dynamic(
+  () => import('@/components/WalletConnect').then(mod => ({ default: mod.WalletConnect })),
+  { ssr: false }
+)
 
 export default function Home() {
   const { isConnected } = useAccount()

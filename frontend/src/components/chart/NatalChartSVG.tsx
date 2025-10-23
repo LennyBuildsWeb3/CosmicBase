@@ -74,7 +74,8 @@ export const NatalChartSVG = forwardRef<SVGSVGElement, NatalChartSVGProps>(({
       height={size}
       viewBox={`0 0 ${size} ${size}`}
       xmlns="http://www.w3.org/2000/svg"
-      style={{ background: 'transparent' }}
+      style={{ background: 'transparent', width: '100%', height: '100%' }}
+      preserveAspectRatio="xMidYMid meet"
     >
       {/* Background circle */}
       <circle
