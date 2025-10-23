@@ -141,18 +141,32 @@ export function MintForm() {
   // Show success state
   if (isSuccess) {
     return (
-      <div className="max-w-2xl mx-auto p-8 bg-white/5 rounded-xl border border-purple-500/20">
+      <div className="max-w-2xl mx-auto p-8 card-cosmic rounded-2xl">
         <div className="text-center">
-          <div className="text-6xl mb-4">🎉</div>
-          <h2 className="text-3xl font-bold mb-4">Birth Chart Minted!</h2>
-          <p className="text-gray-300 mb-6">
+          <div className="text-6xl mb-6 animate-bounce">✨</div>
+          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text text-transparent">
+            Birth Chart Minted!
+          </h2>
+          <p className="text-gray-300 mb-8 text-lg">
             Your cosmic profile has been immortalized on the blockchain
           </p>
           {calculatedChart && (
-            <div className="space-y-2 text-lg">
-              <p>{getSignEmoji(calculatedChart.sunSign)} Sun: {getSignName(calculatedChart.sunSign)}</p>
-              <p>{getSignEmoji(calculatedChart.moonSign)} Moon: {getSignName(calculatedChart.moonSign)}</p>
-              <p>{getSignEmoji(calculatedChart.risingSign)} Rising: {getSignName(calculatedChart.risingSign)}</p>
+            <div className="space-y-4 mb-8 p-6 bg-white/5 rounded-xl border border-purple-500/20">
+              <div className="flex items-center justify-center gap-3 text-xl">
+                <span className="text-3xl">{getSignEmoji(calculatedChart.sunSign)}</span>
+                <span className="text-purple-300">Sun:</span>
+                <span className="font-semibold">{getSignName(calculatedChart.sunSign)}</span>
+              </div>
+              <div className="flex items-center justify-center gap-3 text-xl">
+                <span className="text-3xl">{getSignEmoji(calculatedChart.moonSign)}</span>
+                <span className="text-purple-300">Moon:</span>
+                <span className="font-semibold">{getSignName(calculatedChart.moonSign)}</span>
+              </div>
+              <div className="flex items-center justify-center gap-3 text-xl">
+                <span className="text-3xl">{getSignEmoji(calculatedChart.risingSign)}</span>
+                <span className="text-purple-300">Rising:</span>
+                <span className="font-semibold">{getSignName(calculatedChart.risingSign)}</span>
+              </div>
             </div>
           )}
           <button
@@ -160,7 +174,7 @@ export function MintForm() {
               setStep('form')
               setCalculatedChart(null)
             }}
-            className="mt-8 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-semibold hover:opacity-90 transition-opacity"
+            className="glow-button px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 rounded-xl font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300"
           >
             View Profile
           </button>
@@ -170,8 +184,15 @@ export function MintForm() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-8 bg-white/5 rounded-xl border border-purple-500/20">
-      <h2 className="text-3xl font-bold mb-6">Mint Your Birth Chart</h2>
+    <div className="max-w-2xl mx-auto p-8 card-cosmic rounded-2xl">
+      <div className="text-center mb-8">
+        <h2 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text text-transparent">
+          Mint Your Birth Chart
+        </h2>
+        <p className="text-gray-400 text-sm">
+          Enter your birth details to create your cosmic NFT
+        </p>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Date of Birth */}
@@ -302,14 +323,14 @@ export function MintForm() {
         <button
           type="submit"
           disabled={!isConnected || isPending || isConfirming || step !== 'form'}
-          className="w-full px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          className="glow-button w-full px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 rounded-xl font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
         >
-          {!isConnected && 'Connect Wallet First'}
-          {isConnected && step === 'form' && 'Mint Birth Chart NFT'}
-          {step === 'calculating' && 'Calculating Chart...'}
-          {step === 'uploading' && 'Uploading to IPFS...'}
-          {step === 'minting' && 'Minting NFT...'}
-          {isConfirming && 'Confirming Transaction...'}
+          {!isConnected && '🔒 Connect Wallet First'}
+          {isConnected && step === 'form' && '✨ Mint Birth Chart NFT'}
+          {step === 'calculating' && '🔮 Calculating Chart...'}
+          {step === 'uploading' && '📤 Uploading to IPFS...'}
+          {step === 'minting' && '⚡ Minting NFT...'}
+          {isConfirming && '⏳ Confirming Transaction...'}
         </button>
       </form>
 
