@@ -21,8 +21,51 @@ export function MintForm() {
     latitude: 0,
     longitude: 0
   })
+  const [cityName, setCityName] = useState<string>('')
+  const [isGeocodingLoading, setIsGeocodingLoading] = useState(false)
+  const [locationFound, setLocationFound] = useState(false)
   const [calculatedChart, setCalculatedChart] = useState<any>(null)
   const [formError, setFormError] = useState<string>('')
+
+  // Geocode city name to coordinates
+  const handleCitySearch = async () => {
+    if (!cityName.trim()) {
+      setFormError('Please enter a city name')
+      return
+    }
+
+    setIsGeocodingLoading(true)
+    setFormError('')
+
+    try {
+      // Using Nominatim (OpenStreetMap) API - free and no API key required
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cityName)}&format=json&limit=1`
+      )
+      const data = await response.json()
+
+      if (data && data.length > 0) {
+        const { lat, lon, display_name } = data[0]
+        setFormData({
+          ...formData,
+          latitude: parseFloat(lat),
+          longitude: parseFloat(lon)
+        })
+        setLocationFound(true)
+        setFormError('')
+        console.log(`Location found: ${display_name} (${lat}, ${lon})`)
+      } else {
+        setFormError('Location not found. Please try with city and country (e.g., "Istanbul, Turkey")')
+        setLocationFound(false)
+      }
+    } catch (err) {
+      console.error('Geocoding error:', err)
+      setFormError('Failed to find location. Please try again.')
+      setLocationFound(false)
+    } finally {
+      setIsGeocodingLoading(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,6 +73,12 @@ export function MintForm() {
 
     if (!isConnected || !address) {
       setFormError('Please connect your wallet first')
+      return
+    }
+
+    // Check if location was found
+    if (!locationFound || formData.latitude === 0 || formData.longitude === 0) {
+      setFormError('Please search and select your birth location first')
       return
     }
 
@@ -129,36 +178,45 @@ export function MintForm() {
         <div>
           <label className="block text-sm font-medium mb-2">Date of Birth</label>
           <div className="grid grid-cols-3 gap-4">
-            <input
-              type="number"
-              placeholder="Year"
-              min="1900"
-              max={new Date().getFullYear()}
-              value={formData.year}
-              onChange={e => setFormData({ ...formData, year: parseInt(e.target.value) })}
-              className="px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
-              required
-            />
-            <input
-              type="number"
-              placeholder="Month"
-              min="1"
-              max="12"
-              value={formData.month}
-              onChange={e => setFormData({ ...formData, month: parseInt(e.target.value) })}
-              className="px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
-              required
-            />
-            <input
-              type="number"
-              placeholder="Day"
-              min="1"
-              max="31"
-              value={formData.day}
-              onChange={e => setFormData({ ...formData, day: parseInt(e.target.value) })}
-              className="px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
-              required
-            />
+            <div>
+              <input
+                type="number"
+                placeholder="Day"
+                min="1"
+                max="31"
+                value={formData.day}
+                onChange={e => setFormData({ ...formData, day: parseInt(e.target.value) })}
+                className="w-full px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
+                required
+              />
+              <p className="text-xs text-gray-400 mt-1">Day</p>
+            </div>
+            <div>
+              <input
+                type="number"
+                placeholder="Month"
+                min="1"
+                max="12"
+                value={formData.month}
+                onChange={e => setFormData({ ...formData, month: parseInt(e.target.value) })}
+                className="w-full px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
+                required
+              />
+              <p className="text-xs text-gray-400 mt-1">Month</p>
+            </div>
+            <div>
+              <input
+                type="number"
+                placeholder="Year"
+                min="1900"
+                max={new Date().getFullYear()}
+                value={formData.year}
+                onChange={e => setFormData({ ...formData, year: parseInt(e.target.value) })}
+                className="w-full px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
+                required
+              />
+              <p className="text-xs text-gray-400 mt-1">Year</p>
+            </div>
           </div>
         </div>
 
@@ -166,54 +224,63 @@ export function MintForm() {
         <div>
           <label className="block text-sm font-medium mb-2">Time of Birth</label>
           <div className="grid grid-cols-2 gap-4">
-            <input
-              type="number"
-              placeholder="Hour (0-23)"
-              min="0"
-              max="23"
-              value={formData.hour}
-              onChange={e => setFormData({ ...formData, hour: parseInt(e.target.value) })}
-              className="px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
-              required
-            />
-            <input
-              type="number"
-              placeholder="Minute (0-59)"
-              min="0"
-              max="59"
-              value={formData.minute}
-              onChange={e => setFormData({ ...formData, minute: parseInt(e.target.value) })}
-              className="px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
-              required
-            />
+            <div>
+              <input
+                type="number"
+                placeholder="Hour (0-23)"
+                min="0"
+                max="23"
+                value={formData.hour}
+                onChange={e => setFormData({ ...formData, hour: parseInt(e.target.value) })}
+                className="w-full px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
+                required
+              />
+              <p className="text-xs text-gray-400 mt-1">Hour (24-hour format)</p>
+            </div>
+            <div>
+              <input
+                type="number"
+                placeholder="Minute (0-59)"
+                min="0"
+                max="59"
+                value={formData.minute}
+                onChange={e => setFormData({ ...formData, minute: parseInt(e.target.value) })}
+                className="w-full px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
+                required
+              />
+              <p className="text-xs text-gray-400 mt-1">Minute</p>
+            </div>
           </div>
         </div>
 
         {/* Location */}
         <div>
           <label className="block text-sm font-medium mb-2">Place of Birth</label>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex gap-2">
             <input
-              type="number"
-              step="0.0001"
-              placeholder="Latitude"
-              value={formData.latitude}
-              onChange={e => setFormData({ ...formData, latitude: parseFloat(e.target.value) })}
-              className="px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
-              required
+              type="text"
+              placeholder="Enter city name (e.g., Istanbul, Turkey)"
+              value={cityName}
+              onChange={e => setCityName(e.target.value)}
+              onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), handleCitySearch())}
+              className="flex-1 px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
             />
-            <input
-              type="number"
-              step="0.0001"
-              placeholder="Longitude"
-              value={formData.longitude}
-              onChange={e => setFormData({ ...formData, longitude: parseFloat(e.target.value) })}
-              className="px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
-              required
-            />
+            <button
+              type="button"
+              onClick={handleCitySearch}
+              disabled={isGeocodingLoading || !cityName.trim()}
+              className="px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isGeocodingLoading ? 'Searching...' : 'Find'}
+            </button>
           </div>
+          {locationFound && (
+            <div className="mt-2 p-3 bg-green-500/10 border border-green-500/50 rounded-lg text-green-400 text-sm">
+              ✓ Location found: {formData.latitude.toFixed(4)}, {formData.longitude.toFixed(4)}
+            </div>
+          )}
           <p className="text-xs text-gray-400 mt-2">
-            You can find coordinates at <a href="https://www.latlong.net/" target="_blank" className="text-purple-400 hover:underline">latlong.net</a>
+            Enter your birth city and country for accurate coordinates
           </p>
         </div>
 
