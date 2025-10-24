@@ -17,6 +17,13 @@ export function MintForm() {
 
   const [hasAlreadyMinted, setHasAlreadyMinted] = useState<boolean | null>(null)
   const [isCheckingMint, setIsCheckingMint] = useState(true)
+  const [isMounted, setIsMounted] = useState(false)
+  const [nftData, setNftData] = useState<any>(null)
+
+  // Wait for client-side mounting to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Debug logging
   useEffect(() => {
@@ -26,7 +33,7 @@ export function MintForm() {
   // Check if user has already minted (client-side only)
   useEffect(() => {
     const checkIfMinted = async () => {
-      if (!address || !isConnected) {
+      if (!isMounted || !address || !isConnected) {
         setIsCheckingMint(false)
         return
       }
@@ -49,8 +56,44 @@ export function MintForm() {
         }) as boolean
 
         setHasAlreadyMinted(hasMinted)
+
         if (hasMinted) {
           console.log('User has already minted a birth chart')
+
+          // Fetch NFT data
+          try {
+            const tokenId = await publicClient.readContract({
+              address: CONTRACT_ADDRESS,
+              abi: CONTRACT_ABI,
+              functionName: 'getTokenByAddress',
+              args: [address]
+            }) as bigint
+
+            const birthChart = await publicClient.readContract({
+              address: CONTRACT_ADDRESS,
+              abi: CONTRACT_ABI,
+              functionName: 'getBirthChart',
+              args: [tokenId]
+            }) as any
+
+            console.log('Birth chart data:', birthChart)
+
+            // Fetch metadata from IPFS
+            if (birthChart.metadataURI) {
+              const metadataResponse = await fetch(birthChart.metadataURI.replace('ipfs://', 'https://ipfs.io/ipfs/'))
+              const metadata = await metadataResponse.json()
+
+              setNftData({
+                tokenId: tokenId.toString(),
+                sunSign: birthChart.sunSign,
+                moonSign: birthChart.moonSign,
+                risingSign: birthChart.risingSign,
+                metadata
+              })
+            }
+          } catch (err) {
+            console.error('Error fetching NFT data:', err)
+          }
         }
       } catch (err) {
         console.error('Error checking if user minted:', err)
@@ -61,7 +104,7 @@ export function MintForm() {
     }
 
     checkIfMinted()
-  }, [address, isConnected])
+  }, [address, isConnected, isMounted])
 
   const [step, setStep] = useState<'form' | 'calculating' | 'uploading' | 'minting' | 'success'>('form')
   const [formData, setFormData] = useState<BirthData>({
@@ -281,8 +324,8 @@ export function MintForm() {
     }
   }
 
-  // Show loading state while checking
-  if (isCheckingMint) {
+  // Show loading state during SSR or while checking
+  if (!isMounted || isCheckingMint) {
     return (
       <div className="max-w-2xl mx-auto p-8 card-cosmic rounded-2xl">
         <div className="text-center">
@@ -295,27 +338,103 @@ export function MintForm() {
     )
   }
 
-  // Show already minted message
+  // Show already minted message with NFT details
   if (hasAlreadyMinted === true && isConnected) {
     return (
-      <div className="max-w-2xl mx-auto p-8 card-cosmic rounded-2xl">
-        <div className="text-center">
+      <div className="max-w-4xl mx-auto p-8 card-cosmic rounded-2xl">
+        <div className="text-center mb-8">
           <div className="text-6xl mb-6">🌟</div>
-          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text text-transparent">
-            You Already Have a Birth Chart!
+          <h2 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text text-transparent">
+            Your Cosmic Profile
           </h2>
-          <p className="text-gray-300 mb-8 text-lg">
-            Each wallet can only mint one cosmic profile. View your existing NFT below.
+          <p className="text-gray-400 text-sm">
+            NFT #{nftData?.tokenId || '...'}
           </p>
-          <a
-            href={`https://sepolia.basescan.org/address/${address}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block glow-button px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 rounded-xl font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300"
-          >
-            View Your NFT on BaseScan
-          </a>
         </div>
+
+        {nftData ? (
+          <div className="space-y-6">
+            {/* Chart Image */}
+            {nftData.metadata?.image && (
+              <div className="flex justify-center mb-6">
+                <img
+                  src={nftData.metadata.image}
+                  alt="Birth Chart"
+                  className="rounded-xl border-2 border-purple-500/30 max-w-md w-full"
+                />
+              </div>
+            )}
+
+            {/* Zodiac Signs */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-6 bg-white/5 rounded-xl border border-purple-500/20">
+                <div className="text-center">
+                  <span className="text-5xl mb-2 block">{getSignEmoji(nftData.sunSign)}</span>
+                  <p className="text-purple-300 text-sm mb-1">Sun Sign</p>
+                  <p className="text-xl font-semibold">{getSignName(nftData.sunSign)}</p>
+                </div>
+              </div>
+
+              <div className="p-6 bg-white/5 rounded-xl border border-purple-500/20">
+                <div className="text-center">
+                  <span className="text-5xl mb-2 block">{getSignEmoji(nftData.moonSign)}</span>
+                  <p className="text-purple-300 text-sm mb-1">Moon Sign</p>
+                  <p className="text-xl font-semibold">{getSignName(nftData.moonSign)}</p>
+                </div>
+              </div>
+
+              <div className="p-6 bg-white/5 rounded-xl border border-purple-500/20">
+                <div className="text-center">
+                  <span className="text-5xl mb-2 block">{getSignEmoji(nftData.risingSign)}</span>
+                  <p className="text-purple-300 text-sm mb-1">Rising Sign</p>
+                  <p className="text-xl font-semibold">{getSignName(nftData.risingSign)}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            {nftData.metadata?.description && (
+              <div className="p-6 bg-white/5 rounded-xl border border-purple-500/20">
+                <p className="text-gray-300 text-center">{nftData.metadata.description}</p>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+              <a
+                href={`https://sepolia.basescan.org/token/${CONTRACT_ADDRESS}?a=${nftData.tokenId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block glow-button px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 rounded-xl font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300"
+              >
+                View on BaseScan
+              </a>
+              {nftData.metadata?.image && (
+                <a
+                  href={nftData.metadata.image}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-8 py-4 bg-white/10 border border-purple-500/30 rounded-xl font-semibold text-lg hover:bg-white/20 transition-all duration-300"
+                >
+                  View Full Image
+                </a>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="text-center">
+            <div className="text-6xl mb-4 animate-pulse">🔮</div>
+            <p className="text-gray-300 mb-8">Loading your cosmic profile...</p>
+            <a
+              href={`https://sepolia.basescan.org/address/${address}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block glow-button px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 rounded-xl font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300"
+            >
+              View Your NFTs on BaseScan
+            </a>
+          </div>
+        )}
       </div>
     )
   }
