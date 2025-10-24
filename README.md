@@ -6,6 +6,8 @@ CosmicBase is a decentralized application that creates immutable birth chart NFT
 
 🌐 **Live Demo:** https://cosmicbase.app
 
+![CosmicBase App](docs/cosmicbase-app.jpg)
+
 ## Features
 
 - **Birth Chart NFT**: Mint your unique astrological profile as an NFT
@@ -104,6 +106,26 @@ hasUserMinted(address user)
 3. Make sure you're on Base Sepolia testnet
 4. Enter your birth details and mint your NFT
 5. View your birth chart and check compatibility with other addresses
+
+## Architecture
+
+CosmicBase follows a decentralized architecture that ensures your astrological data is permanent, private, and truly owned by you.
+
+![CosmicBase Architecture](docs/ARCHITECTURE.png)
+
+### How It Works:
+
+1. **Swiss Ephemeris Calculation**: Professional-grade astronomical calculations determine exact planetary positions at your birth time
+2. **IPFS Upload**: Frontend securely uploads your complete birth chart data to IPFS via Pinata for permanent decentralized storage
+3. **NFT Minting**: Smart contract on Base Sepolia mints your unique ERC-721 NFT with your Sun, Moon, and Rising signs
+4. **Permanent Identity**: Your cosmic profile lives forever on the blockchain, fully owned and controlled by you
+
+### Technical Stack:
+- **Calculations**: Swiss Ephemeris (NASA JPL precision)
+- **Storage**: IPFS via Pinata (decentralized, permanent)
+- **Blockchain**: Base Sepolia (Layer 2, low gas fees)
+- **Contract**: ERC-721 (standard NFT protocol)
+- **Privacy**: Birth data hashed onchain, full details on IPFS
 
 ## Base Batches 002: Builder Track
 
