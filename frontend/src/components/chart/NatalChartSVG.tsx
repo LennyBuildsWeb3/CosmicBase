@@ -8,7 +8,9 @@ interface NatalChartSVGProps {
   moonSign: string
   risingSign: string
   customization: ChartCustomization
-  planets?: Record<string, any>
+  planets?: any
+  houses?: any[]
+  aspects?: any[]
 }
 
 export const NatalChartSVG = forwardRef<SVGSVGElement, NatalChartSVGProps>(({
@@ -16,7 +18,9 @@ export const NatalChartSVG = forwardRef<SVGSVGElement, NatalChartSVGProps>(({
   moonSign,
   risingSign,
   customization,
-  planets
+  planets,
+  houses,
+  aspects
 }, ref) => {
   const theme = COLOR_THEMES[customization.colorTheme]
   const size = 800
@@ -62,6 +66,71 @@ export const NatalChartSVG = forwardRef<SVGSVGElement, NatalChartSVGProps>(({
       y: center + radius * Math.sin(rad)
     }
   }
+
+  // Get planet positions from the chart data
+  const getPlanetPositions = () => {
+    if (!planets) return []
+
+    // Handle both array and object with 'all' property
+    const planetArray = Array.isArray(planets) ? planets : planets.all || []
+
+    // Filter out North Node and South Node
+    const filteredPlanets = planetArray.filter((planet: any) => {
+      const label = planet.label
+      return label !== 'North Node' && label !== 'South Node' && label !== 'NNode' && label !== 'SNode'
+    })
+
+    return filteredPlanets.map((planet: any) => ({
+      name: planet.label,
+      symbol: planetSymbols[planet.label] || planet.label[0],
+      degree: planet.ChartPosition.Ecliptic.DecimalDegrees,
+      sign: planet.Sign.label,
+      color: getPlanetColor(planet.label)
+    }))
+  }
+
+  // Get house cusps
+  const getHouseCusps = () => {
+    if (!houses || houses.length === 0) return []
+
+    return houses.map((house: any, index: number) => ({
+      number: index + 1,
+      degree: house.ChartPosition.StartPosition.Ecliptic.DecimalDegrees
+    }))
+  }
+
+  // Get planet color based on traditional astrology
+  const getPlanetColor = (planetName: string): string => {
+    const colors: Record<string, string> = {
+      'Sun': '#FFD700',
+      'Moon': '#E0E0E0',
+      'Mercury': '#87CEEB',
+      'Venus': '#FFB6C1',
+      'Mars': '#FF4500',
+      'Jupiter': '#DDA0DD',
+      'Saturn': '#8B7355',
+      'Uranus': '#40E0D0',
+      'Neptune': '#9370DB',
+      'Pluto': '#8B4513'
+    }
+    return colors[planetName] || theme.colors.primary
+  }
+
+  // Get aspect color and style
+  const getAspectStyle = (aspectType: string) => {
+    const styles: Record<string, { color: string; width: number; dash: string; opacity: number }> = {
+      'conjunction': { color: '#FFD700', width: 2, dash: '', opacity: 0.6 },
+      'opposition': { color: '#FF4500', width: 2, dash: '', opacity: 0.5 },
+      'trine': { color: '#00FF00', width: 1.5, dash: '', opacity: 0.4 },
+      'square': { color: '#FF0000', width: 1.5, dash: '', opacity: 0.4 },
+      'sextile': { color: '#00BFFF', width: 1, dash: '3,3', opacity: 0.3 },
+      'quincunx': { color: '#9370DB', width: 1, dash: '2,2', opacity: 0.2 }
+    }
+    return styles[aspectType.toLowerCase()] || { color: theme.colors.primary, width: 0.5, dash: '1,1', opacity: 0.15 }
+  }
+
+  const planetPositions = getPlanetPositions()
+  const houseCusps = getHouseCusps()
 
   // Draw zodiac wheel
   const zodiacSigns = Object.keys(zodiacSymbols)
@@ -151,9 +220,9 @@ export const NatalChartSVG = forwardRef<SVGSVGElement, NatalChartSVGProps>(({
               y={symbolPos.y}
               textAnchor="middle"
               dominantBaseline="middle"
-              fontSize="24"
+              fontSize="32"
               fill={theme.colors.primary}
-              opacity="0.5"
+              opacity="0.7"
             >
               {zodiacSymbols[sign]}
             </text>
@@ -161,12 +230,79 @@ export const NatalChartSVG = forwardRef<SVGSVGElement, NatalChartSVGProps>(({
         )
       })}
 
-      {/* Center circle */}
+      {/* House divisions */}
+      {houseCusps.length > 0 && houseCusps.map((house, index) => {
+        const houseStart = getPosition(house.degree, innerRadius - 10)
+        const houseEnd = getPosition(house.degree, 120)
+        const houseNumberPos = getPosition(house.degree + 15, 220) // Offset for house number
+
+        return (
+          <g key={`house-${index}`}>
+            {/* House division line */}
+            <line
+              x1={houseStart.x}
+              y1={houseStart.y}
+              x2={houseEnd.x}
+              y2={houseEnd.y}
+              stroke={theme.colors.accent}
+              strokeWidth="2"
+              opacity="0.8"
+            />
+            {/* House number */}
+            <text
+              x={houseNumberPos.x}
+              y={houseNumberPos.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize="18"
+              fill={theme.colors.accent}
+              opacity="0.9"
+              fontWeight="bold"
+            >
+              {house.number}
+            </text>
+          </g>
+        )
+      })}
+
+      {/* Aspect lines - Draw first so they're behind planets */}
+      {aspects && aspects.length > 0 && aspects.map((aspect: any, index: number) => {
+        // Check if aspect has the required properties
+        if (!aspect.point1 || !aspect.point2 || !aspect.point1.label || !aspect.point2.label) {
+          return null
+        }
+
+        // Find the positions of the two planets involved in the aspect
+        const planet1Pos = planetPositions.find(p => p.name === aspect.point1.label)
+        const planet2Pos = planetPositions.find(p => p.name === aspect.point2.label)
+
+        if (!planet1Pos || !planet2Pos) return null
+
+        const pos1 = getPosition(planet1Pos.degree, 230)
+        const pos2 = getPosition(planet2Pos.degree, 230)
+        const style = getAspectStyle(aspect.aspectLevel || aspect.type || '')
+
+        return (
+          <line
+            key={`aspect-${index}`}
+            x1={pos1.x}
+            y1={pos1.y}
+            x2={pos2.x}
+            y2={pos2.y}
+            stroke={style.color}
+            strokeWidth={style.width}
+            strokeDasharray={style.dash}
+            opacity={style.opacity}
+          />
+        )
+      })}
+
+      {/* Inner circle for cleaner look */}
       <circle
         cx={center}
         cy={center}
-        r={180}
-        fill="rgba(0, 0, 0, 0.3)"
+        r={110}
+        fill="rgba(0, 0, 0, 0.5)"
         stroke="url(#wheelGradient)"
         strokeWidth="2"
       />
@@ -174,109 +310,113 @@ export const NatalChartSVG = forwardRef<SVGSVGElement, NatalChartSVGProps>(({
       {/* Display name */}
       <text
         x={center}
-        y={center - 60}
+        y={center - 40}
         textAnchor="middle"
-        fontSize="28"
+        fontSize="24"
         fontWeight="bold"
         fill={theme.colors.primary}
       >
         {customization.displayName || 'Natal Chart'}
       </text>
 
-      {/* Main placements */}
+      {/* Main placements summary in center */}
       <g>
         {/* Sun */}
         <text
           x={center}
-          y={center - 10}
+          y={center - 5}
           textAnchor="middle"
-          fontSize="48"
-          fill={theme.colors.accent}
+          fontSize="20"
+          fill="#FFD700"
         >
-          {planetSymbols.Sun}
-        </text>
-        <text
-          x={center}
-          y={center + 20}
-          textAnchor="middle"
-          fontSize="16"
-          fill={theme.colors.primary}
-        >
-          {zodiacSymbols[sunSign]} {sunSign}
+          {planetSymbols.Sun} {zodiacSymbols[sunSign]}
         </text>
 
         {/* Moon */}
         <text
-          x={center - 80}
-          y={center + 60}
+          x={center}
+          y={center + 20}
           textAnchor="middle"
-          fontSize="32"
-          fill={theme.colors.secondary}
+          fontSize="18"
+          fill="#E0E0E0"
         >
-          {planetSymbols.Moon}
-        </text>
-        <text
-          x={center - 80}
-          y={center + 85}
-          textAnchor="middle"
-          fontSize="14"
-          fill={theme.colors.primary}
-        >
-          {zodiacSymbols[moonSign]}
+          {planetSymbols.Moon} {zodiacSymbols[moonSign]}
         </text>
 
-        {/* Rising (Ascendant) */}
+        {/* Rising */}
         <text
-          x={center + 80}
-          y={center + 60}
+          x={center}
+          y={center + 40}
           textAnchor="middle"
-          fontSize="32"
+          fontSize="18"
           fill={theme.colors.secondary}
         >
-          ↑
-        </text>
-        <text
-          x={center + 80}
-          y={center + 85}
-          textAnchor="middle"
-          fontSize="14"
-          fill={theme.colors.primary}
-        >
-          {zodiacSymbols[risingSign]}
+          ↑ {zodiacSymbols[risingSign]}
         </text>
       </g>
 
-      {/* Decorative elements */}
-      {customization.chartStyle === 'traditional' && (
-        <>
-          {/* Aspect lines (decorative) */}
-          <line
-            x1={center - 150}
-            y1={center}
-            x2={center + 150}
-            y2={center}
-            stroke={theme.colors.primary}
-            strokeWidth="1"
-            opacity="0.2"
-            strokeDasharray="5,5"
-          />
-          <line
-            x1={center}
-            y1={center - 150}
-            x2={center}
-            y2={center + 150}
-            stroke={theme.colors.primary}
-            strokeWidth="1"
-            opacity="0.2"
-            strokeDasharray="5,5"
-          />
-        </>
-      )}
+      {/* Planet positions on the wheel */}
+      {planetPositions.map((planet, index) => {
+        const planetRadius = 250
+        const planetPos = getPosition(planet.degree, planetRadius)
+
+        // Add a small connecting line to the zodiac wheel
+        const lineStart = getPosition(planet.degree, innerRadius)
+        const lineEnd = getPosition(planet.degree, planetRadius - 20)
+
+        return (
+          <g key={`planet-${index}`}>
+            {/* Connection line */}
+            <line
+              x1={lineStart.x}
+              y1={lineStart.y}
+              x2={lineEnd.x}
+              y2={lineEnd.y}
+              stroke={planet.color}
+              strokeWidth="1"
+              opacity="0.4"
+            />
+
+            {/* Planet symbol */}
+            <circle
+              cx={planetPos.x}
+              cy={planetPos.y}
+              r="18"
+              fill="rgba(0, 0, 0, 0.7)"
+              stroke={planet.color}
+              strokeWidth="2"
+            />
+            <text
+              x={planetPos.x}
+              y={planetPos.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize="20"
+              fill={planet.color}
+              fontWeight="bold"
+            >
+              {planet.symbol}
+            </text>
+
+            {/* Degree marker */}
+            <text
+              x={planetPos.x}
+              y={planetPos.y + 32}
+              textAnchor="middle"
+              fontSize="10"
+              fill={planet.color}
+              opacity="0.8"
+            >
+              {Math.floor(planet.degree % 30)}°
+            </text>
+          </g>
+        )
+      })}
 
       {/* Footer */}
       <text
         x={center}
-        y={size - 40}
+        y={size - 20}
         textAnchor="middle"
         fontSize="14"
         fill={theme.colors.primary}

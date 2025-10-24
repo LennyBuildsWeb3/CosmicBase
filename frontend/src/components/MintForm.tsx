@@ -326,7 +326,20 @@ export function MintForm() {
   }
 
   // Show loading state during SSR or while checking
-  if (!isMounted || isCheckingMint) {
+  if (!isMounted) {
+    return (
+      <div className="max-w-2xl mx-auto p-8 card-cosmic rounded-2xl">
+        <div className="text-center">
+          <div className="text-6xl mb-6 animate-pulse">🔮</div>
+          <h2 className="text-2xl font-bold mb-4 text-purple-300">
+            Loading...
+          </h2>
+        </div>
+      </div>
+    )
+  }
+
+  if (isCheckingMint) {
     return (
       <div className="max-w-2xl mx-auto p-8 card-cosmic rounded-2xl">
         <div className="text-center">
@@ -635,7 +648,9 @@ export function MintForm() {
                   moonSign={getSignName(calculatedChart.moonSign)}
                   risingSign={getSignName(calculatedChart.risingSign)}
                   customization={customization}
-                  planets={calculatedChart.fullChart?.CelestialBodies}
+                  planets={calculatedChart.fullChart?.celestialBodies}
+                  houses={calculatedChart.fullChart?.houses}
+                  aspects={calculatedChart.fullChart?.aspects}
                 />
               </div>
             </div>
@@ -659,7 +674,9 @@ export function MintForm() {
               moonSign={getSignName(calculatedChart.moonSign)}
               risingSign={getSignName(calculatedChart.risingSign)}
               customization={customization}
-              planets={calculatedChart.fullChart?.CelestialBodies}
+              planets={calculatedChart.fullChart?.celestialBodies}
+              houses={calculatedChart.fullChart?.houses}
+              aspects={calculatedChart.fullChart?.aspects}
             />
           </div>
         )}
