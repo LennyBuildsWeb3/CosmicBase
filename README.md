@@ -4,6 +4,8 @@
 
 CosmicBase is a decentralized application that creates immutable birth chart NFTs on the Base blockchain, combining professional Swiss Ephemeris calculations with blockchain technology.
 
+🌐 **Live Demo:** https://cosmicbase.app
+
 ## Features
 
 - **Birth Chart NFT**: Mint your unique astrological profile as an NFT
