@@ -343,7 +343,6 @@ export function MintForm() {
     return (
       <div className="max-w-4xl mx-auto p-8 card-cosmic rounded-2xl">
         <div className="text-center mb-8">
-          <div className="text-6xl mb-6">🌟</div>
           <h2 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text text-transparent">
             Your Cosmic Profile
           </h2>
