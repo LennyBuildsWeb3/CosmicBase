@@ -192,7 +192,7 @@ export const NatalChartSVG = forwardRef<SVGSVGElement, NatalChartSVGProps>(({
       />
 
       {/* Zodiac divisions and symbols */}
-      {zodiacSigns.map((sign, index) => {
+      {zodiacSigns.map((sign: string, index: number) => {
         const startAngle = index * anglePerSign
         const middleAngle = startAngle + anglePerSign / 2
         const symbolPos = getPosition(middleAngle, (outerRadius + innerRadius) / 2)
@@ -231,7 +231,7 @@ export const NatalChartSVG = forwardRef<SVGSVGElement, NatalChartSVGProps>(({
       })}
 
       {/* House divisions */}
-      {houseCusps.length > 0 && houseCusps.map((house, index) => {
+      {houseCusps.length > 0 && houseCusps.map((house: any, index: number) => {
         const houseStart = getPosition(house.degree, innerRadius - 10)
         const houseEnd = getPosition(house.degree, 120)
         const houseNumberPos = getPosition(house.degree + 15, 220) // Offset for house number
@@ -356,7 +356,7 @@ export const NatalChartSVG = forwardRef<SVGSVGElement, NatalChartSVGProps>(({
       </g>
 
       {/* Planet positions on the wheel */}
-      {planetPositions.map((planet, index) => {
+      {planetPositions.map((planet: any, index: number) => {
         const planetRadius = 250
         const planetPos = getPosition(planet.degree, planetRadius)
 
