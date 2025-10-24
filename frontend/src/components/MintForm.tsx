@@ -9,6 +9,7 @@ import { ChartCustomization } from '@/types/customization'
 import { CustomizationPanel } from './chart/CustomizationPanel'
 import { NatalChartSVG } from './chart/NatalChartSVG'
 import { svgToBlob } from '@/lib/chartImage'
+import { AddressDisplay } from './AddressDisplay'
 
 export function MintForm() {
   const { address, isConnected } = useAccount()
@@ -346,9 +347,14 @@ export function MintForm() {
           <h2 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text text-transparent">
             Your Cosmic Profile
           </h2>
-          <p className="text-gray-400 text-sm">
-            NFT #{nftData?.tokenId || '...'}
-          </p>
+          <div className="flex flex-col items-center gap-2">
+            <div className="text-sm">
+              <AddressDisplay address={address} linkToBaseScan={true} />
+            </div>
+            <p className="text-gray-400 text-sm">
+              NFT #{nftData?.tokenId || '...'}
+            </p>
+          </div>
         </div>
 
         {nftData ? (

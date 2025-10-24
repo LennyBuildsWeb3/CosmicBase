@@ -1,6 +1,7 @@
 'use client'
 
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import { AddressDisplay } from './AddressDisplay'
 
 export function WalletConnect() {
   const { address, isConnected } = useAccount()
@@ -25,9 +26,11 @@ export function WalletConnect() {
     return (
       <div className="flex items-center gap-4">
         <div className="bg-white/5 px-4 py-2 rounded-lg border border-purple-500/20">
-          <span className="text-sm text-gray-300">
-            {address.slice(0, 6)}...{address.slice(-4)}
-          </span>
+          <AddressDisplay
+            address={address}
+            linkToBaseScan={true}
+            className="text-sm"
+          />
         </div>
         <button
           onClick={() => disconnect()}

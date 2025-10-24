@@ -15,9 +15,9 @@ CosmicBase is a decentralized application that creates immutable birth chart NFT
 - **Birth Chart NFT**: Mint your unique astrological profile as an NFT
 - **Swiss Ephemeris**: Professional-grade planetary calculations
 - **Compatibility Check**: Compare cosmic compatibility with other wallets
-- **Daily Horoscope**: Personalized insights based on your birth chart
+- **Basename Integration**: Display readable names instead of addresses (yourname.base.eth)
 - **Fully Decentralized**: IPFS + Base blockchain (no database)
-- **Basename Integration**: Custom cosmic usernames
+- **Privacy-Preserving**: Birth data hashed onchain, full details on IPFS
 
 ## Tech Stack
 
@@ -129,6 +129,23 @@ CosmicBase follows a decentralized architecture that ensures your astrological d
 - **Contract**: ERC-721 (standard NFT protocol)
 - **Privacy**: Birth data hashed onchain, full details on IPFS
 
+## Basenames Integration
+
+CosmicBase integrates with Base's naming service (Basenames) to provide a better user experience:
+
+- **Automatic Resolution**: Wallet addresses are automatically resolved to readable `.base.eth` names
+- **Navbar Display**: Your Basename appears in the wallet connection display
+- **Profile View**: NFT profiles show Basenames instead of truncated addresses
+- **BaseScan Links**: Click any address/basename to view on BaseScan
+
+If you have a Basename (e.g., `yourname.base.eth`), it will be displayed throughout the app instead of `0x1234...5678`.
+
+**How to get a Basename:**
+1. Visit [base.org/names](https://www.base.org/names)
+2. Search for your desired name
+3. Register your `.base.eth` name
+4. It will automatically appear in CosmicBase!
+
 ## Base Batches 002: Builder Track
 
 This project is built for Base Batches 002: Builder Track.
@@ -142,9 +159,7 @@ This project is built for Base Batches 002: Builder Track.
 - Publicly accessible URL (https://cosmicbase.app)
 - Multiple transactions on Base testnet
 - Demo video (Intro, Demo, Problem, Solution, Architecture)
-
-🚧 **Optional Enhancement:**
-- Basenames integration (strongly recommended but not required)
+- Basenames integration (automatic address resolution to readable names)
 
 ## Privacy
 
