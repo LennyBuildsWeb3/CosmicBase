@@ -273,8 +273,8 @@ export const NatalChartSVG = forwardRef<SVGSVGElement, NatalChartSVGProps>(({
         }
 
         // Find the positions of the two planets involved in the aspect
-        const planet1Pos = planetPositions.find(p => p.name === aspect.point1.label)
-        const planet2Pos = planetPositions.find(p => p.name === aspect.point2.label)
+        const planet1Pos = planetPositions.find((p: any) => p.name === aspect.point1.label)
+        const planet2Pos = planetPositions.find((p: any) => p.name === aspect.point2.label)
 
         if (!planet1Pos || !planet2Pos) return null
 
