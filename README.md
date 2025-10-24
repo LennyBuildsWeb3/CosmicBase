@@ -72,24 +72,55 @@ npm run dev
 
 ## Smart Contract
 
-**CosmicBaseNFT** - ERC-721 NFT contract on Base Sepolia
+### CosmicBaseNFT - ERC-721 NFT Contract
 
-- Mint birth chart NFTs
+**Deployment Details:**
+- **Contract Address**: `0xb8c8cec09d8e43acafbb054b9244a81319caffc1`
+- **Network**: Base Sepolia Testnet
+- **Chain ID**: 84532
+- **Contract Name**: CosmicBase Birth Chart
+- **Symbol**: COSMIC
+- **View on BaseScan**: [https://sepolia.basescan.org/token/0xb8c8cec09d8e43acafbb054b9244a81319caffc1](https://sepolia.basescan.org/token/0xb8c8cec09d8e43acafbb054b9244a81319caffc1)
+
+**Features:**
+- Mint birth chart NFTs (one per address)
 - Store birth data hash (privacy-preserving)
 - IPFS metadata integration
+- Onchain compatibility calculation
+- Sun, Moon, and Rising sign storage
+- ERC-721 standard compliance
+
+**Key Functions:**
+```solidity
+mintBirthChart(bytes32 birthDataHash, string metadataURI, uint8 sunSign, uint8 moonSign, uint8 risingSign)
+getBirthChart(uint256 tokenId)
+calculateCompatibility(uint256 tokenId1, uint256 tokenId2)
+hasUserMinted(address user)
+```
+
+**How to Interact:**
+1. Visit [cosmicbase.app](https://cosmicbase.app)
+2. Connect your wallet (MetaMask, Coinbase Wallet, etc.)
+3. Make sure you're on Base Sepolia testnet
+4. Enter your birth details and mint your NFT
+5. View your birth chart and check compatibility with other addresses
 
 ## Base Batches 002: Builder Track
 
 This project is built for Base Batches 002: Builder Track.
 
-### Requirements Met:
+### Competition Requirements:
 
-- Functioning onchain app on Base
+✅ **Completed:**
+- Functioning onchain app on Base Sepolia
 - Open-source GitHub repository
-- Deployed to Base testnet
-- Publicly accessible URL
-- Basenames integration
-- Demo video
+- Smart contract deployed and verified
+- Publicly accessible URL (https://cosmicbase.app)
+- Multiple transactions on Base testnet
+
+🚧 **In Progress:**
+- Demo video (Intro, Demo, Problem, Solution, Architecture)
+- Basenames integration (strongly recommended)
 
 ## Privacy
 
