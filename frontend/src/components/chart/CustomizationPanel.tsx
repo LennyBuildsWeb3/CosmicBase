@@ -1,6 +1,6 @@
 'use client'
 
-import { ChartCustomization, COLOR_THEMES, CHART_STYLES, ZODIAC_ART_STYLES, ColorTheme, ChartStyle, ZodiacArtStyle } from '@/types/customization'
+import { ChartCustomization, COLOR_THEMES, ColorTheme } from '@/types/customization'
 
 interface CustomizationPanelProps {
   customization: ChartCustomization
@@ -66,61 +66,6 @@ export function CustomizationPanel({ customization, onChange }: CustomizationPan
         </div>
       </div>
 
-      {/* Chart Style */}
-      <div>
-        <label className="block text-sm font-medium mb-3">Chart Style</label>
-        <div className="space-y-2">
-          {(Object.keys(CHART_STYLES) as ChartStyle[]).map(styleKey => {
-            const style = CHART_STYLES[styleKey]
-            const isSelected = customization.chartStyle === styleKey
-
-            return (
-              <button
-                key={styleKey}
-                type="button"
-                onClick={() => onChange({ ...customization, chartStyle: styleKey })}
-                className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
-                  isSelected
-                    ? 'border-purple-500 bg-purple-500/20'
-                    : 'border-purple-500/20 bg-white/5 hover:border-purple-500/50'
-                }`}
-              >
-                <p className="font-medium mb-1">{style.name}</p>
-                <p className="text-xs text-gray-400">{style.description}</p>
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Zodiac Art Style */}
-      <div>
-        <label className="block text-sm font-medium mb-3">Zodiac Symbol Style</label>
-        <div className="grid grid-cols-3 gap-3">
-          {(Object.keys(ZODIAC_ART_STYLES) as ZodiacArtStyle[]).map(artKey => {
-            const art = ZODIAC_ART_STYLES[artKey]
-            const isSelected = customization.zodiacArtStyle === artKey
-
-            return (
-              <button
-                key={artKey}
-                type="button"
-                onClick={() => onChange({ ...customization, zodiacArtStyle: artKey })}
-                className={`p-4 rounded-lg border-2 transition-all ${
-                  isSelected
-                    ? 'border-purple-500 bg-purple-500/20'
-                    : 'border-purple-500/20 bg-white/5 hover:border-purple-500/50'
-                }`}
-              >
-                <p className="text-2xl mb-2">
-                  {artKey === 'detailed' ? '✨' : artKey === 'minimal' ? '○' : '◊'}
-                </p>
-                <p className="text-sm font-medium">{art.name}</p>
-              </button>
-            )
-          })}
-        </div>
-      </div>
     </div>
   )
 }
