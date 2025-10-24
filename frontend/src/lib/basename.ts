@@ -17,8 +17,15 @@ export async function getBasename(
   chainId: number = 84532
 ): Promise<string | null> {
   try {
-    const chain = chainId === 8453 ? base : baseSepolia
-    const resolverAddress = chainId === 8453 ? L2_RESOLVER_ADDRESS : L2_RESOLVER_ADDRESS_SEPOLIA
+    // Basenames are only available on Base Mainnet (not Sepolia)
+    // Return null for testnet to gracefully fallback to address display
+    if (chainId !== 8453) {
+      console.log('Basenames only available on Base Mainnet, skipping for testnet')
+      return null
+    }
+
+    const chain = base
+    const resolverAddress = L2_RESOLVER_ADDRESS
 
     const publicClient = createPublicClient({
       chain,

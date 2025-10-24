@@ -137,14 +137,15 @@ CosmicBase integrates with Base's naming service (Basenames) to provide a better
 - **Navbar Display**: Your Basename appears in the wallet connection display
 - **Profile View**: NFT profiles show Basenames instead of truncated addresses
 - **BaseScan Links**: Click any address/basename to view on BaseScan
+- **Graceful Fallback**: On testnet (Sepolia), addresses are displayed in shortened format
 
-If you have a Basename (e.g., `yourname.base.eth`), it will be displayed throughout the app instead of `0x1234...5678`.
+**Note:** Basenames are currently only available on Base Mainnet. The app gracefully falls back to displaying shortened addresses (0x1234...5678) on testnet.
 
-**How to get a Basename:**
+**How to get a Basename (Mainnet only):**
 1. Visit [base.org/names](https://www.base.org/names)
 2. Search for your desired name
 3. Register your `.base.eth` name
-4. It will automatically appear in CosmicBase!
+4. When the app is used on Base Mainnet, your Basename will automatically appear!
 
 ## Base Batches 002: Builder Track
 

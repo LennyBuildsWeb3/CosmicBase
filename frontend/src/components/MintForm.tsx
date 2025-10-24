@@ -348,9 +348,11 @@ export function MintForm() {
             Your Cosmic Profile
           </h2>
           <div className="flex flex-col items-center gap-2">
-            <div className="text-sm">
-              <AddressDisplay address={address} linkToBaseScan={true} />
-            </div>
+            {address && (
+              <div className="text-sm">
+                <AddressDisplay address={address} linkToBaseScan={true} />
+              </div>
+            )}
             <p className="text-gray-400 text-sm">
               NFT #{nftData?.tokenId || '...'}
             </p>
