@@ -15,6 +15,54 @@ export function MintForm() {
   const { writeContract, data: hash, isPending, error } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
 
+  const [hasAlreadyMinted, setHasAlreadyMinted] = useState<boolean | null>(null)
+  const [isCheckingMint, setIsCheckingMint] = useState(true)
+
+  // Debug logging
+  useEffect(() => {
+    console.log('MintForm state:', { isPending, isConfirming, isSuccess, hash, error: error?.message })
+  }, [isPending, isConfirming, isSuccess, hash, error])
+
+  // Check if user has already minted (client-side only)
+  useEffect(() => {
+    const checkIfMinted = async () => {
+      if (!address || !isConnected) {
+        setIsCheckingMint(false)
+        return
+      }
+
+      try {
+        // We'll check this by calling the contract
+        const { createPublicClient, http } = await import('viem')
+        const { baseSepolia } = await import('viem/chains')
+
+        const publicClient = createPublicClient({
+          chain: baseSepolia,
+          transport: http()
+        })
+
+        const hasMinted = await publicClient.readContract({
+          address: CONTRACT_ADDRESS,
+          abi: CONTRACT_ABI,
+          functionName: 'hasUserMinted',
+          args: [address]
+        }) as boolean
+
+        setHasAlreadyMinted(hasMinted)
+        if (hasMinted) {
+          console.log('User has already minted a birth chart')
+        }
+      } catch (err) {
+        console.error('Error checking if user minted:', err)
+        setHasAlreadyMinted(false)
+      } finally {
+        setIsCheckingMint(false)
+      }
+    }
+
+    checkIfMinted()
+  }, [address, isConnected])
+
   const [step, setStep] = useState<'form' | 'calculating' | 'uploading' | 'minting' | 'success'>('form')
   const [formData, setFormData] = useState<BirthData>({
     year: 1990,
@@ -112,6 +160,12 @@ export function MintForm() {
       return
     }
 
+    // Check if user already minted
+    if (hasAlreadyMinted) {
+      setFormError('You have already minted your birth chart! Each wallet can only mint once.')
+      return
+    }
+
     // Check if location was found
     if (!locationFound || formData.latitude === 0 || formData.longitude === 0) {
       setFormError('Please search and select your birth location first')
@@ -182,7 +236,16 @@ export function MintForm() {
 
       // Step 3: Mint NFT
       setStep('minting')
-      await writeContract({
+      console.log('Calling writeContract with:', {
+        address: CONTRACT_ADDRESS,
+        birthDataHash: chart.birthDataHash,
+        ipfsUri,
+        sunSign: chart.sunSign,
+        moonSign: chart.moonSign,
+        risingSign: chart.risingSign
+      })
+
+      const txHash = await writeContract({
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'mintBirthChart',
@@ -194,6 +257,8 @@ export function MintForm() {
           chart.risingSign
         ]
       })
+
+      console.log('Transaction submitted:', txHash)
 
     } catch (err: any) {
       console.error('Mint error:', err)
@@ -214,6 +279,45 @@ export function MintForm() {
         setFormError('Transaction failed. Please try again.')
       }
     }
+  }
+
+  // Show loading state while checking
+  if (isCheckingMint) {
+    return (
+      <div className="max-w-2xl mx-auto p-8 card-cosmic rounded-2xl">
+        <div className="text-center">
+          <div className="text-6xl mb-6 animate-pulse">🔮</div>
+          <h2 className="text-2xl font-bold mb-4 text-purple-300">
+            Checking your cosmic profile...
+          </h2>
+        </div>
+      </div>
+    )
+  }
+
+  // Show already minted message
+  if (hasAlreadyMinted === true && isConnected) {
+    return (
+      <div className="max-w-2xl mx-auto p-8 card-cosmic rounded-2xl">
+        <div className="text-center">
+          <div className="text-6xl mb-6">🌟</div>
+          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text text-transparent">
+            You Already Have a Birth Chart!
+          </h2>
+          <p className="text-gray-300 mb-8 text-lg">
+            Each wallet can only mint one cosmic profile. View your existing NFT below.
+          </p>
+          <a
+            href={`https://sepolia.basescan.org/address/${address}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block glow-button px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 rounded-xl font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300"
+          >
+            View Your NFT on BaseScan
+          </a>
+        </div>
+      </div>
+    )
   }
 
   // Show success state

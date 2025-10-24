@@ -14,7 +14,7 @@ export const config = createConfig({
       metadata: {
         name: 'CosmicBase',
         description: 'Mint your birth chart as an NFT on Base blockchain',
-        url: 'https://cosmicbase.xyz',
+        url: typeof window !== 'undefined' ? window.location.origin : 'https://cosmicbase.xyz',
         icons: ['https://cosmicbase.xyz/icon.png']
       },
       showQrModal: true

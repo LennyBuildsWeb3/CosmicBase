@@ -5,6 +5,9 @@ import { Web3Provider } from '@/providers/Web3Provider'
 export const metadata: Metadata = {
   title: 'CosmicBase - Onchain Astrology',
   description: 'Mint your birth chart as an NFT on Base blockchain',
+  icons: {
+    icon: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({
