@@ -78,7 +78,8 @@ export function AddressDisplay({
   )
 
   if (linkToBaseScan) {
-    const baseScanUrl = (chainId && chainId === 8453)
+    // Base Mainnet = 8453, Base Sepolia = 84532
+    const baseScanUrl = (chainId as number) === 8453
       ? `https://basescan.org/address/${address}`
       : `https://sepolia.basescan.org/address/${address}`
 
