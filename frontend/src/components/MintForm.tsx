@@ -288,7 +288,7 @@ export function MintForm() {
         risingSign: chart.risingSign
       })
 
-      const txHash = await writeContract({
+      writeContract({
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'mintBirthChart',
@@ -301,7 +301,7 @@ export function MintForm() {
         ]
       })
 
-      console.log('Transaction submitted:', txHash)
+      console.log('Transaction submitted - waiting for confirmation...')
 
     } catch (err: any) {
       console.error('Mint error:', err)
@@ -515,7 +515,7 @@ export function MintForm() {
                 min="1"
                 max="31"
                 value={formData.day}
-                onChange={e => setFormData({ ...formData, day: parseInt(e.target.value) })}
+                onChange={e => setFormData({ ...formData, day: parseInt(e.target.value) || 1 })}
                 className="w-full px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
                 required
               />
@@ -528,7 +528,7 @@ export function MintForm() {
                 min="1"
                 max="12"
                 value={formData.month}
-                onChange={e => setFormData({ ...formData, month: parseInt(e.target.value) })}
+                onChange={e => setFormData({ ...formData, month: parseInt(e.target.value) || 1 })}
                 className="w-full px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
                 required
               />
@@ -541,7 +541,7 @@ export function MintForm() {
                 min="1900"
                 max={new Date().getFullYear()}
                 value={formData.year}
-                onChange={e => setFormData({ ...formData, year: parseInt(e.target.value) })}
+                onChange={e => setFormData({ ...formData, year: parseInt(e.target.value) || 1990 })}
                 className="w-full px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
                 required
               />
@@ -561,7 +561,7 @@ export function MintForm() {
                 min="0"
                 max="23"
                 value={formData.hour}
-                onChange={e => setFormData({ ...formData, hour: parseInt(e.target.value) })}
+                onChange={e => setFormData({ ...formData, hour: parseInt(e.target.value) || 0 })}
                 className="w-full px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
                 required
               />
@@ -574,7 +574,7 @@ export function MintForm() {
                 min="0"
                 max="59"
                 value={formData.minute}
-                onChange={e => setFormData({ ...formData, minute: parseInt(e.target.value) })}
+                onChange={e => setFormData({ ...formData, minute: parseInt(e.target.value) || 0 })}
                 className="w-full px-4 py-2 bg-white/5 border border-purple-500/20 rounded-lg focus:border-purple-500 focus:outline-none"
                 required
               />

@@ -6,6 +6,8 @@ CosmicBase is a decentralized application that creates immutable birth chart NFT
 
 🌐 **Live Demo:** https://cosmicbase.app
 
+🎥 **Demo Video:** [Watch on GitHub](docs/CosmicBase.mp4)
+
 ![CosmicBase App](docs/cosmicbase-app.jpg)
 
 ## Features
@@ -139,10 +141,10 @@ This project is built for Base Batches 002: Builder Track.
 - Smart contract deployed and verified
 - Publicly accessible URL (https://cosmicbase.app)
 - Multiple transactions on Base testnet
-
-🚧 **In Progress:**
 - Demo video (Intro, Demo, Problem, Solution, Architecture)
-- Basenames integration (strongly recommended)
+
+🚧 **Optional Enhancement:**
+- Basenames integration (strongly recommended but not required)
 
 ## Privacy
 
