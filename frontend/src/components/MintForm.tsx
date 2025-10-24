@@ -351,15 +351,24 @@ export function MintForm() {
               </div>
             </div>
           )}
-          <button
-            onClick={() => {
-              setStep('form')
-              setCalculatedChart(null)
-            }}
-            className="glow-button px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 rounded-xl font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300"
-          >
-            View Profile
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href={`https://sepolia.basescan.org/tx/${hash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block glow-button px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 rounded-xl font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300"
+            >
+              View Transaction
+            </a>
+            <a
+              href={`https://sepolia.basescan.org/address/${address}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-8 py-4 bg-white/10 border border-purple-500/30 rounded-xl font-semibold text-lg hover:bg-white/20 transition-all duration-300"
+            >
+              View Your NFTs
+            </a>
+          </div>
         </div>
       </div>
     )
