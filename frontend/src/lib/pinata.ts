@@ -11,13 +11,9 @@ export interface BirthChartMetadata {
     trait_type: string
     value: string | number
   }>
-  birthChart: {
-    sunSign: string
-    moonSign: string
-    risingSign: string
-    planets: Record<string, any>
-    houses: Record<string, any>
-  }
+  // Privacy-focused: Only store chart visualization, not full chart data
+  // Full chart calculations are done client-side and not stored on IPFS
+  // This protects users' exact birth date, time, and location
   customization?: {
     displayName: string
     colorTheme: string

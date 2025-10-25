@@ -263,11 +263,13 @@ export function MintForm() {
           { trait_type: 'Sun Sign', value: getSignName(chart.sunSign) },
           { trait_type: 'Moon Sign', value: getSignName(chart.moonSign) },
           { trait_type: 'Rising Sign', value: getSignName(chart.risingSign) },
-          { trait_type: 'Birth Year', value: formData.year },
+          // Privacy: Birth year removed to protect user privacy
           { trait_type: 'Color Theme', value: customization.colorTheme },
           { trait_type: 'Chart Style', value: customization.chartStyle }
         ],
-        birthChart: chart.fullChart,
+        // Privacy: Full birth chart data is NOT stored on IPFS
+        // Only the visualization (image) is stored publicly
+        // This protects exact birth date, time, and location
         customization: {
           displayName: customization.displayName,
           colorTheme: customization.colorTheme,
