@@ -23,6 +23,18 @@ export function MintFormFHE({ onMintSuccess }: MintFormFHEProps) {
   const [mounted, setMounted] = useState(false)
   useEffect(() => {
     setMounted(true)
+    // Load cached metadata URI from localStorage
+    const cached = localStorage.getItem('cosmicbase_pending_mint')
+    if (cached) {
+      try {
+        const data = JSON.parse(cached)
+        if (data.metadataURI && data.address) {
+          setCachedMetadataURI(data.metadataURI)
+        }
+      } catch (e) {
+        localStorage.removeItem('cosmicbase_pending_mint')
+      }
+    }
   }, [])
 
   // Form state
@@ -58,6 +70,7 @@ export function MintFormFHE({ onMintSuccess }: MintFormFHEProps) {
   const [isEncrypting, setIsEncrypting] = useState(false)
   const [metadataURI, setMetadataURI] = useState<string | null>(null)
   const [chartImageBlob, setChartImageBlob] = useState<Blob | null>(null)
+  const [cachedMetadataURI, setCachedMetadataURI] = useState<string | null>(null)
 
   // Contract interaction
   const { data: hash, writeContract, isPending: isWriting, error: writeError } = useWriteContract()
@@ -311,6 +324,16 @@ export function MintFormFHE({ onMintSuccess }: MintFormFHEProps) {
       const metadataUri = await uploadToPinata(metadata as any)
       setMetadataURI(metadataUri)
 
+      // Cache metadata URI for resume if mint fails
+      localStorage.setItem('cosmicbase_pending_mint', JSON.stringify({
+        metadataURI: metadataUri,
+        address: address,
+        sunSign: calculatedChart.sunSign,
+        moonSign: calculatedChart.moonSign,
+        risingSign: calculatedChart.risingSign,
+        timestamp: Date.now()
+      }))
+
       // Proceed to minting
       setStep('minting')
 
@@ -371,12 +394,67 @@ export function MintFormFHE({ onMintSuccess }: MintFormFHEProps) {
     }
   }
 
+  // Resume mint with cached metadata
+  const handleResumeMint = async () => {
+    if (!address || !calculatedChart || !cachedMetadataURI) return
+
+    setStep('encrypting')
+    setError(null)
+
+    try {
+      // Re-encrypt birth data
+      await initFhevm()
+      const encrypted = await encryptBirthData(
+        birthData,
+        FHE_CONTRACT_ADDRESS,
+        address
+      )
+      setEncryptedData(encrypted)
+      setStep('minting')
+
+      // Use cached metadata URI
+      const formattedInputs = formatEncryptedInputsForContract(encrypted)
+
+      // Load cached data for signs
+      const cached = JSON.parse(localStorage.getItem('cosmicbase_pending_mint') || '{}')
+
+      writeContract({
+        address: FHE_CONTRACT_ADDRESS,
+        abi: FHE_CONTRACT_ABI,
+        functionName: 'mintBirthChart',
+        args: [
+          formattedInputs[0],
+          formattedInputs[1],
+          formattedInputs[2],
+          formattedInputs[3],
+          formattedInputs[4],
+          formattedInputs[5],
+          formattedInputs[6],
+          formattedInputs[7],
+          cachedMetadataURI,
+          cached.sunSign || calculatedChart.sunSign,
+          cached.moonSign || calculatedChart.moonSign,
+          cached.risingSign || calculatedChart.risingSign,
+        ],
+        gas: BigInt(3000000),
+      })
+    } catch (err: any) {
+      console.error('Resume mint error:', err)
+      setError('Failed to resume minting. ' + (err?.message || ''))
+      setStep('preview')
+    }
+  }
+
   // Handle mint success
   useEffect(() => {
     if (isSuccess && hash) {
       console.log('=== MINT SUCCESS ===')
       console.log('Transaction hash:', hash)
       console.log('Receipt:', receipt)
+
+      // Clear cached pending mint on success
+      localStorage.removeItem('cosmicbase_pending_mint')
+      setCachedMetadataURI(null)
 
       // Refresh NFT data after successful mint
       setTimeout(() => {
@@ -688,6 +766,14 @@ export function MintFormFHE({ onMintSuccess }: MintFormFHEProps) {
             </div>
           </div>
 
+          {cachedMetadataURI && (
+            <div className="mb-4 p-3 bg-yellow-900/30 border border-yellow-500/50 rounded-lg">
+              <p className="text-sm text-yellow-300">
+                You have a pending mint from a previous session. You can resume without re-uploading.
+              </p>
+            </div>
+          )}
+
           <div className="flex gap-4">
             <button
               onClick={() => setStep('input')}
@@ -695,13 +781,23 @@ export function MintFormFHE({ onMintSuccess }: MintFormFHEProps) {
             >
               Back
             </button>
-            <button
-              onClick={handleEncrypt}
-              disabled={isEncrypting || isWriting || isConfirming || hasAlreadyMinted}
-              className="flex-1 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg"
-            >
-              {hasAlreadyMinted ? 'Already Minted' : 'Encrypt & Mint'}
-            </button>
+            {cachedMetadataURI ? (
+              <button
+                onClick={handleResumeMint}
+                disabled={isEncrypting || isWriting || isConfirming || hasAlreadyMinted}
+                className="flex-1 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg"
+              >
+                Resume Mint
+              </button>
+            ) : (
+              <button
+                onClick={handleEncrypt}
+                disabled={isEncrypting || isWriting || isConfirming || hasAlreadyMinted}
+                className="flex-1 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg"
+              >
+                {hasAlreadyMinted ? 'Already Minted' : 'Encrypt & Mint'}
+              </button>
+            )}
           </div>
         </div>
       )}
