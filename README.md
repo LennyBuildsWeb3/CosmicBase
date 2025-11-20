@@ -17,7 +17,7 @@ CosmicBase uses Zama's Fully Homomorphic Encryption (FHE) to encrypt birth data 
 ## How It Works
 
 1. User connects wallet and enters birth information
-2. Frontend encrypts the data using fhevmjs
+2. Frontend encrypts the data using @zama-fhe/relayer-sdk
 3. Encrypted data is sent to the smart contract
 4. Contract stores encrypted values using FHEVM types
 5. NFT is minted with public signs and encrypted private data
@@ -53,7 +53,7 @@ Key implementation details:
 
 ## Tech Stack
 
-- Zama FHEVM (@fhevm/solidity v0.9.1, fhevmjs)
+- Zama FHEVM (@fhevm/solidity v0.9.1, @zama-fhe/relayer-sdk)
 - Solidity 0.8.24
 - Hardhat
 - Next.js 14
@@ -64,7 +64,7 @@ Key implementation details:
 ## Installation
 
 ```bash
-git clone https://github.com/AstroXWinner/cosmicbase.git
+git clone https://github.com/LennyBuildsWeb3/CosmicBase.git
 cd cosmicbase
 
 # Install dependencies
@@ -136,7 +136,7 @@ cosmicbase/
 
 ## FHE Integration
 
-The frontend uses fhevmjs to encrypt user input:
+The frontend uses @zama-fhe/relayer-sdk to encrypt user input:
 
 ```typescript
 const input = instance.createEncryptedInput(contractAddress, userAddress)

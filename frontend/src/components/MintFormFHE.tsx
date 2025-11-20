@@ -77,9 +77,9 @@ export function MintFormFHE({ onMintSuccess }: MintFormFHEProps) {
     risingSign: number
     imageUrl?: string
   } | null>(null)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
 
-  useEffect(() => {
-    const checkIfMinted = async () => {
+  const fetchNFTData = useCallback(async () => {
       if (!address || !publicClient) return
 
       try {
@@ -134,11 +134,12 @@ export function MintFormFHE({ onMintSuccess }: MintFormFHEProps) {
         }
       } catch (err) {
         console.error('Error checking mint status:', err)
-      }
     }
-
-    checkIfMinted()
   }, [address, publicClient])
+
+  useEffect(() => {
+    fetchNFTData()
+  }, [fetchNFTData, refreshTrigger])
 
   // Location search handler
   const searchLocation = useCallback(async () => {
@@ -376,6 +377,11 @@ export function MintFormFHE({ onMintSuccess }: MintFormFHEProps) {
       console.log('=== MINT SUCCESS ===')
       console.log('Transaction hash:', hash)
       console.log('Receipt:', receipt)
+
+      // Refresh NFT data after successful mint
+      setTimeout(() => {
+        setRefreshTrigger(prev => prev + 1)
+      }, 2000)
 
       // Get token ID from event logs
       onMintSuccess?.(BigInt(1)) // Simplified - actual implementation should parse logs
@@ -710,6 +716,32 @@ export function MintFormFHE({ onMintSuccess }: MintFormFHEProps) {
           </p>
           {isConfirming && (
             <p className="text-sm text-gray-400">Waiting for transaction confirmation...</p>
+          )}
+          {hash && step === 'minting' && (
+            <div className="mt-4 space-y-2">
+              <p className="text-xs text-gray-500">
+                Transaction submitted. If this takes too long, you can check manually.
+              </p>
+              <div className="flex gap-2 justify-center">
+                <a
+                  href={`https://sepolia.etherscan.io/tx/${hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded"
+                >
+                  View TX
+                </a>
+                <button
+                  onClick={() => {
+                    setRefreshTrigger(prev => prev + 1)
+                    setStep('input')
+                  }}
+                  className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded"
+                >
+                  Check My NFT
+                </button>
+              </div>
+            </div>
           )}
         </div>
       )}

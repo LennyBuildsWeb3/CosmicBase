@@ -1,4 +1,4 @@
-import { http, createConfig } from 'wagmi'
+import { http, createConfig, fallback } from 'wagmi'
 import { sepolia } from 'wagmi/chains'
 import { injected, walletConnect } from 'wagmi/connectors'
 
@@ -7,6 +7,19 @@ const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || ''
 
 // Infura API Key for Sepolia
 const infuraApiKey = process.env.NEXT_PUBLIC_INFURA_API_KEY || ''
+
+// RPC configuration with fallbacks for better reliability
+const sepoliaTransport = infuraApiKey
+  ? fallback([
+      http(`https://sepolia.infura.io/v3/${infuraApiKey}`, { timeout: 20000 }),
+      http('https://ethereum-sepolia-rpc.publicnode.com', { timeout: 20000 }),
+      http('https://rpc.sepolia.org', { timeout: 30000 }),
+    ])
+  : fallback([
+      http('https://ethereum-sepolia-rpc.publicnode.com', { timeout: 20000 }),
+      http('https://rpc2.sepolia.org', { timeout: 20000 }),
+      http('https://rpc.sepolia.org', { timeout: 30000 }),
+    ])
 
 export const config = createConfig({
   chains: [sepolia],
@@ -24,11 +37,7 @@ export const config = createConfig({
     })
   ],
   transports: {
-    [sepolia.id]: http(
-      infuraApiKey
-        ? `https://sepolia.infura.io/v3/${infuraApiKey}`
-        : 'https://rpc.sepolia.org'
-    )
+    [sepolia.id]: sepoliaTransport
   }
 })
 
