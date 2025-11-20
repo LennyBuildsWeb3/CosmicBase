@@ -173,4 +173,4 @@ MIT
 
 - Live App: https://cosmicbase.app
 - Contract: https://sepolia.etherscan.io/address/0xD0CC51718B89456d33BF14d5019228646838636F#code
-- Zama FHEVM: https://docs.zama.ai/fhevm
+- Zama FHEVM: https://docs.zama.org/protocol
