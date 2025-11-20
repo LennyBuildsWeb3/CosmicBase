@@ -8,7 +8,7 @@ import { useChainId } from 'wagmi'
 interface AddressDisplayProps {
   address: Address
   showFullAddress?: boolean
-  linkToBaseScan?: boolean
+  linkToExplorer?: boolean
   className?: string
 }
 
@@ -19,7 +19,7 @@ interface AddressDisplayProps {
 export function AddressDisplay({
   address,
   showFullAddress = false,
-  linkToBaseScan = false,
+  linkToExplorer = false,
   className = ''
 }: AddressDisplayProps) {
   const [basename, setBasename] = useState<string | null>(null)
@@ -77,15 +77,13 @@ export function AddressDisplay({
     </span>
   )
 
-  if (linkToBaseScan) {
-    // Base Mainnet = 8453, Base Sepolia = 84532
-    const baseScanUrl = (chainId as number) === 8453
-      ? `https://basescan.org/address/${address}`
-      : `https://sepolia.basescan.org/address/${address}`
+  if (linkToExplorer) {
+    // Ethereum Sepolia = 11155111
+    const explorerUrl = `https://sepolia.etherscan.io/address/${address}`
 
     return (
       <a
-        href={baseScanUrl}
+        href={explorerUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="hover:text-purple-300 transition-colors inline-flex items-center gap-1"

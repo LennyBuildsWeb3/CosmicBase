@@ -16,14 +16,13 @@ dist/
 # Environment variables
 .env
 .env*.local
-contracts/.env
+contracts-fhe/.env
+frontend/.env.local
 
 # Hardhat
 cache/
 artifacts/
 typechain-types/
-contracts/cache/
-contracts/artifacts/
 deployments/
 
 # IDE
@@ -53,4 +52,5 @@ yarn-error.log*
 
 # Keep example env files
 !.env.example
-!contracts/.env.example
+!contracts-fhe/.env.example
+!frontend/.env.example

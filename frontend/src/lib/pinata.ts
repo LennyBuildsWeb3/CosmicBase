@@ -130,7 +130,5 @@ export function getIPFSUrl(ipfsUri: string): string {
  * In production, you'd generate an actual chart visualization
  */
 export function generateChartImageUrl(sunSign: string, moonSign: string, risingSign: string): string {
-  // For now, return a placeholder
-  // TODO: Generate actual birth chart visualization
   return `https://api.dicebear.com/7.x/shapes/svg?seed=${sunSign}-${moonSign}-${risingSign}`
 }

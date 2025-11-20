@@ -28,7 +28,7 @@ export function WalletConnect() {
         <div className="bg-white/5 px-4 py-2 rounded-lg border border-purple-500/20">
           <AddressDisplay
             address={address}
-            linkToBaseScan={true}
+            linkToExplorer={true}
             className="text-sm"
           />
         </div>

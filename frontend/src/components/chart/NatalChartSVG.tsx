@@ -138,6 +138,7 @@ export const NatalChartSVG = forwardRef<SVGSVGElement, NatalChartSVGProps>(({
 
   return (
     <svg
+      id="natal-chart-svg"
       ref={ref}
       width={size}
       height={size}

@@ -365,7 +365,7 @@ export function MintForm() {
           <div className="flex flex-col items-center gap-2">
             {address && (
               <div className="text-sm">
-                <AddressDisplay address={address} linkToBaseScan={true} />
+                <AddressDisplay address={address} linkToExplorer={true} />
               </div>
             )}
             <p className="text-gray-400 text-sm">

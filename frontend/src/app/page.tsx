@@ -1,16 +1,29 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { MintForm } from '@/components/MintForm'
 import { useAccount } from 'wagmi'
+import { useState, useEffect } from 'react'
 
 const WalletConnect = dynamic(
   () => import('@/components/WalletConnect').then(mod => ({ default: mod.WalletConnect })),
   { ssr: false }
 )
 
+const MintFormFHE = dynamic(
+  () => import('@/components/MintFormFHE').then(mod => ({ default: mod.MintFormFHE })),
+  { ssr: false, loading: () => <div className="p-6 bg-gray-800 rounded-lg text-center"><p className="text-gray-300">Loading...</p></div> }
+)
+
 export default function Home() {
   const { isConnected } = useAccount()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Use mounted check to prevent hydration mismatch
+  const showMintForm = mounted && isConnected
 
   return (
     <main className="relative flex min-h-screen flex-col items-center p-6 md:p-24">
@@ -28,24 +41,24 @@ export default function Home() {
           <WalletConnect />
         </div>
 
-        {!isConnected ? (
+        {!showMintForm ? (
           <>
             <div className="text-center mb-16 max-w-3xl">
               <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text text-transparent">
                 Mint Your Birth Chart as an NFT
               </h2>
               <p className="text-lg text-gray-300 leading-relaxed">
-                Transform your astrological profile into a permanent digital asset on Base blockchain.
-                Discover your cosmic identity and connect with the universe.
+                Transform your astrological profile into a privacy-preserving NFT using Fully Homomorphic Encryption.
+                Your birth data is encrypted on-chain - only you can decrypt it.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mb-16">
               <div className="card-cosmic p-8 rounded-2xl group cursor-pointer">
-                <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform">🌙</div>
-                <h3 className="text-xl font-bold mb-3 text-purple-200">Birth Chart NFT</h3>
+                <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform">🔐</div>
+                <h3 className="text-xl font-bold mb-3 text-purple-200">FHE Privacy</h3>
                 <p className="text-gray-300 text-sm leading-relaxed">
-                  Mint your unique astrological profile as a permanent NFT with your Sun, Moon, and Rising signs
+                  Your birth data is encrypted using Zama FHE - only you can decrypt your sensitive information
                 </p>
               </div>
 
@@ -69,7 +82,7 @@ export default function Home() {
             <div className="flex flex-col items-center gap-4">
               <div className="flex items-center gap-2 text-gray-400 text-sm">
                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                <span>Built on Base Sepolia Testnet</span>
+                <span>Built on Ethereum Sepolia with Zama FHE</span>
               </div>
               <p className="text-gray-500 text-xs">
                 Connect your wallet to start your cosmic journey
@@ -78,7 +91,7 @@ export default function Home() {
           </>
         ) : (
           <div className="w-full">
-            <MintForm />
+            <MintFormFHE />
           </div>
         )}
       </div>
