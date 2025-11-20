@@ -108,24 +108,26 @@ export function MintFormFHE({ onMintSuccess }: MintFormFHEProps) {
             args: [tokenId],
           }) as any
 
+          let imageUrl: string | undefined
+
+          // Fetch metadata from IPFS to get image URL
+          try {
+            const gateway = 'https://dweb.link/ipfs/'
+            const metadataUrl = chartData.metadataURI.replace('ipfs://', gateway)
+            const response = await fetch(metadataUrl)
+            const metadata = await response.json()
+            imageUrl = metadata.image?.replace('ipfs://', gateway)
+          } catch (err) {
+            console.error('Error fetching NFT metadata:', err)
+          }
+
           const nftData = {
             tokenId,
             metadataURI: chartData.metadataURI,
             sunSign: chartData.sunSign,
             moonSign: chartData.moonSign,
             risingSign: chartData.risingSign,
-          }
-
-          // Fetch metadata from IPFS to get image URL
-          try {
-            // Use Pinata's dedicated gateway or dweb.link as fallback
-            const gateway = 'https://dweb.link/ipfs/'
-            const metadataUrl = chartData.metadataURI.replace('ipfs://', gateway)
-            const response = await fetch(metadataUrl)
-            const metadata = await response.json()
-            nftData.imageUrl = metadata.image?.replace('ipfs://', gateway)
-          } catch (err) {
-            console.error('Error fetching NFT metadata:', err)
+            imageUrl,
           }
 
           setExistingNFT(nftData)
