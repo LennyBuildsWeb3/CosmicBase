@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { TestnetDisclaimer } from '@/components/TestnetDisclaimer'
+import { StatsDisplay } from '@/components/StatsDisplay'
 
 const WalletConnect = dynamic(
   () => import('@/components/WalletConnect').then(mod => ({ default: mod.WalletConnect })),
@@ -91,6 +92,11 @@ export default function Home() {
                   Get personalized horoscope and cosmic guidance based on your unique birth chart
                 </p>
               </div>
+            </div>
+
+            {/* Stats Display */}
+            <div className="w-full max-w-xs mb-16">
+              <StatsDisplay />
             </div>
 
             <div className="flex flex-col items-center gap-4">
