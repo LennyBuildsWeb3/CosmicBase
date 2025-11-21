@@ -10,6 +10,7 @@ import { FHE_CONTRACT_ADDRESS, FHE_CONTRACT_ABI, formatEncryptedInputsForContrac
 import { NatalChartSVG } from './chart/NatalChartSVG'
 import { svgToBlob } from '@/lib/chartImage'
 import { ChartCustomization } from '@/types/customization'
+import Link from 'next/link'
 
 interface MintFormFHEProps {
   onMintSuccess?: (tokenId: bigint) => void
@@ -734,9 +735,12 @@ export function MintFormFHE({ onMintSuccess }: MintFormFHEProps) {
                 className="mt-1 w-4 h-4 rounded border-gray-600 bg-gray-800 text-purple-500 focus:ring-purple-500 focus:ring-offset-0"
               />
               <span className="text-sm text-gray-300 leading-relaxed">
-                I understand that I am voluntarily providing my birth data (date, time, location).
-                This data will be encrypted using FHE and stored on the blockchain.
-                I accept full responsibility for providing this personal information.
+                I have read and agree to the{' '}
+                <Link href="/privacy" target="_blank" className="text-purple-400 hover:text-purple-300 underline">
+                  Privacy Policy & Disclaimer
+                </Link>
+                . I understand that I am voluntarily providing my birth data and accept full
+                responsibility for its use.
               </span>
             </label>
           </div>

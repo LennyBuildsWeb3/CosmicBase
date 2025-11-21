@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic'
 import { useAccount } from 'wagmi'
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { TestnetDisclaimer } from '@/components/TestnetDisclaimer'
 
 const WalletConnect = dynamic(
@@ -108,6 +109,19 @@ export default function Home() {
           </div>
         )}
         </div>
+
+        {/* Footer */}
+        <footer className="mt-16 pt-8 border-t border-gray-800 w-full text-center">
+          <div className="flex flex-col md:flex-row justify-center items-center gap-4 text-sm text-gray-500">
+            <span>&copy; 2024 CosmicBase</span>
+            <span className="hidden md:inline">|</span>
+            <Link href="/privacy" className="text-purple-400 hover:text-purple-300 transition-colors">
+              Privacy Policy & Disclaimer
+            </Link>
+            <span className="hidden md:inline">|</span>
+            <span>Built for Zama AI Guild Builder Track</span>
+          </div>
+        </footer>
       </main>
     </>
   )
