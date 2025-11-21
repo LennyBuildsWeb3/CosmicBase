@@ -71,6 +71,7 @@ export function MintFormFHE({ onMintSuccess }: MintFormFHEProps) {
   const [metadataURI, setMetadataURI] = useState<string | null>(null)
   const [chartImageBlob, setChartImageBlob] = useState<Blob | null>(null)
   const [cachedMetadataURI, setCachedMetadataURI] = useState<string | null>(null)
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
 
   // Contract interaction
   const { data: hash, writeContract, isPending: isWriting, error: writeError } = useWriteContract()
@@ -723,9 +724,26 @@ export function MintFormFHE({ onMintSuccess }: MintFormFHEProps) {
             )}
           </div>
 
+          {/* Privacy Disclaimer Checkbox */}
+          <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={privacyAccepted}
+                onChange={e => setPrivacyAccepted(e.target.checked)}
+                className="mt-1 w-4 h-4 rounded border-gray-600 bg-gray-800 text-purple-500 focus:ring-purple-500 focus:ring-offset-0"
+              />
+              <span className="text-sm text-gray-300 leading-relaxed">
+                I understand that I am voluntarily providing my birth data (date, time, location).
+                This data will be encrypted using FHE and stored on the blockchain.
+                I accept full responsibility for providing this personal information.
+              </span>
+            </label>
+          </div>
+
           <button
             onClick={() => setStep('preview')}
-            disabled={!locationFound || isCalculating || !calculatedChart}
+            disabled={!locationFound || isCalculating || !calculatedChart || !privacyAccepted}
             className="w-full py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg"
           >
             {isCalculating ? 'Calculating...' : 'Preview Chart'}

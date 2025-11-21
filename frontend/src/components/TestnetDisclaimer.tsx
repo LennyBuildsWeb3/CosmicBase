@@ -41,6 +41,14 @@ export function TestnetDisclaimer() {
           <p className="text-gray-400 text-xs leading-relaxed">
             Built for the <strong className="text-purple-300">Zama AI Guild Developer Program - Builder Track</strong>.
           </p>
+
+          {/* Privacy Notice */}
+          <div className="mt-3 pt-3 border-t border-gray-700">
+            <p className="text-gray-400 text-xs leading-relaxed">
+              <strong className="text-gray-300">Privacy:</strong> Your birth data is encrypted using FHE and stored on-chain.
+              Only you can decrypt it. We do not store your personal information on any centralized server.
+            </p>
+          </div>
         </div>
 
         {/* Checkbox */}

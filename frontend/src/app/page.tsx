@@ -29,6 +29,16 @@ export default function Home() {
   return (
     <>
       <TestnetDisclaimer />
+
+      {/* Testnet Beta Badge */}
+      <div className="fixed top-4 right-4 z-40">
+        <div className="px-3 py-1.5 bg-yellow-500/20 border border-yellow-500/50 rounded-full backdrop-blur-sm">
+          <span className="text-xs font-semibold text-yellow-400 tracking-wide">
+            TESTNET BETA
+          </span>
+        </div>
+      </div>
+
       <main className="relative flex min-h-screen flex-col items-center p-6 md:p-24">
         <div className="z-10 max-w-6xl w-full items-center justify-center flex flex-col">
         {/* Header */}
