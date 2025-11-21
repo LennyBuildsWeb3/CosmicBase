@@ -2,6 +2,8 @@
 
 A privacy-preserving astrology NFT application built with Zama FHEVM. Users can mint their birth chart as an NFT while keeping sensitive birth data encrypted on-chain.
 
+**Built for [Zama Developer Program](https://guild.xyz/zama/developer-program) - Builder Track**
+
 **Live Demo:** https://cosmicbase.app
 
 ![CosmicBase Screenshot](assets/screenshot.jpg)
