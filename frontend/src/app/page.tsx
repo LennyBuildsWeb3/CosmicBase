@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic'
 import { useAccount } from 'wagmi'
 import { useState, useEffect } from 'react'
+import { TestnetDisclaimer } from '@/components/TestnetDisclaimer'
 
 const WalletConnect = dynamic(
   () => import('@/components/WalletConnect').then(mod => ({ default: mod.WalletConnect })),
@@ -26,8 +27,10 @@ export default function Home() {
   const showMintForm = mounted && isConnected
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center p-6 md:p-24">
-      <div className="z-10 max-w-6xl w-full items-center justify-center flex flex-col">
+    <>
+      <TestnetDisclaimer />
+      <main className="relative flex min-h-screen flex-col items-center p-6 md:p-24">
+        <div className="z-10 max-w-6xl w-full items-center justify-center flex flex-col">
         {/* Header */}
         <div className="w-full flex flex-col md:flex-row justify-between items-center mb-16 gap-6">
           <div className="text-center md:text-left">
@@ -94,7 +97,8 @@ export default function Home() {
             <MintFormFHE />
           </div>
         )}
-      </div>
-    </main>
+        </div>
+      </main>
+    </>
   )
 }
