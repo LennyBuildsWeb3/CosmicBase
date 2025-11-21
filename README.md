@@ -8,6 +8,21 @@ A privacy-preserving astrology NFT application built with Zama FHEVM. Users can 
 
 ![CosmicBase Screenshot](assets/screenshot.jpg)
 
+## Demo Video
+
+[Coming Soon]
+
+## Features
+
+- FHE-encrypted birth data storage on-chain
+- Encrypted aggregate statistics using FHE computation (FHE.add)
+- Astrological compatibility calculation between users
+- Privacy-preserving NFT with public signs and private birth data
+- Access control - only token owner can decrypt their data
+- Transfer of encrypted data permissions on NFT transfer
+- Privacy Policy and Disclaimer for legal protection
+- 27 passing unit and integration tests
+
 ## Problem
 
 Birth charts contain sensitive personal information including exact birth date, time, and location. Traditional NFT solutions store this data in plain text, creating privacy and security risks. This information can be used for identity theft or personal profiling.
@@ -15,6 +30,14 @@ Birth charts contain sensitive personal information including exact birth date, 
 ## Solution
 
 CosmicBase uses Zama's Fully Homomorphic Encryption (FHE) to encrypt birth data before storing it on-chain. Only the NFT owner can decrypt and view their private information. The application displays public astrological signs (Sun, Moon, Rising) while keeping the underlying birth data completely private.
+
+### FHE Computation
+
+Beyond just storing encrypted data, CosmicBase performs **encrypted computation on-chain**:
+
+- **Encrypted Aggregate Stats**: The contract maintains encrypted counters for total mints and per-zodiac-sign counts using `FHE.add()` operations
+- Each mint triggers encrypted arithmetic operations without ever decrypting the underlying values
+- This demonstrates the true power of FHE - computation on encrypted data while maintaining privacy
 
 ## How It Works
 
@@ -46,12 +69,14 @@ Key implementation details:
 - Encrypted inputs via externalEuint types
 - Access control with FHE.allow() and FHE.allowThis()
 - Coordinates stored as offset-encoded unsigned integers
+- **FHE Computation**: Uses `FHE.add()` for encrypted aggregate statistics
+- Encrypted counters track total mints and per-sign distributions without decryption
 
 ## Deployed Contract
 
 | Network | Address | Verified |
 |---------|---------|----------|
-| Ethereum Sepolia | 0xD0CC51718B89456d33BF14d5019228646838636F | [Etherscan](https://sepolia.etherscan.io/address/0xD0CC51718B89456d33BF14d5019228646838636F#code) |
+| Ethereum Sepolia | 0xE37743B10BB6E48436072DE66B516A40335E2632 | [Etherscan](https://sepolia.etherscan.io/address/0xE37743B10BB6E48436072DE66B516A40335E2632#code) |
 
 ## Tech Stack
 
@@ -82,7 +107,7 @@ npm install
 Create `frontend/.env.local`:
 
 ```
-NEXT_PUBLIC_FHE_CONTRACT_ADDRESS=0xD0CC51718B89456d33BF14d5019228646838636F
+NEXT_PUBLIC_FHE_CONTRACT_ADDRESS=0xE37743B10BB6E48436072DE66B516A40335E2632
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
 NEXT_PUBLIC_INFURA_API_KEY=your_infura_key
 NEXT_PUBLIC_PINATA_JWT=your_pinata_jwt
@@ -156,11 +181,34 @@ const encrypted = input.encrypt()
 
 Encrypted handles and input proof are sent to the contract. The contract verifies and stores the encrypted values, granting access only to the token owner.
 
-## Testing
+## Unit Tests
+
+Run the test suite:
+
+```bash
+cd contracts-fhe
+npx hardhat test
+```
+
+Test coverage includes:
+- Deployment and initialization (4 tests)
+- Stats initialization and FHE computation (3 tests)
+- Minting validation (5 tests)
+- User minting status (2 tests)
+- Compatibility calculation (1 test)
+- Access control (1 test)
+- ERC721 compliance (2 tests)
+- Sign compatibility logic (2 tests)
+- Gas estimation (2 tests)
+- Integration tests (5 tests)
+
+Total: 27 passing tests
+
+## Manual Testing
 
 The application is deployed on Ethereum Sepolia testnet. You need Sepolia ETH to mint NFTs.
 
-To test:
+To test manually:
 1. Visit https://cosmicbase.app
 2. Connect your wallet (MetaMask or WalletConnect)
 3. Enter birth information
@@ -174,5 +222,5 @@ MIT
 ## Links
 
 - Live App: https://cosmicbase.app
-- Contract: https://sepolia.etherscan.io/address/0xD0CC51718B89456d33BF14d5019228646838636F#code
+- Contract: https://sepolia.etherscan.io/address/0xE37743B10BB6E48436072DE66B516A40335E2632#code
 - Zama FHEVM: https://docs.zama.org/protocol

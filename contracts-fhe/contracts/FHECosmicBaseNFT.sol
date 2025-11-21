@@ -46,6 +46,13 @@ contract FHECosmicBaseNFT is ERC721, ERC721URIStorage, Ownable, ZamaEthereumConf
     mapping(address => uint256) public userToToken;
     mapping(address => bool) public hasMinted;
 
+    // Encrypted aggregate statistics - FHE computation on sign counts
+    euint32 private encryptedTotalMints;
+    euint32[12] private encryptedSunSignCounts;  // Count per zodiac sign (0-11)
+
+    // Flag to track if stats are initialized
+    bool private statsInitialized;
+
     // Events
     event ChartMinted(
         address indexed user,
@@ -57,6 +64,7 @@ contract FHECosmicBaseNFT is ERC721, ERC721URIStorage, Ownable, ZamaEthereumConf
     );
 
     event MetadataUpdated(uint256 indexed tokenId, string newMetadataURI);
+    event StatsUpdated(uint256 totalMints);
 
     /**
      * @dev Constructor
@@ -66,6 +74,27 @@ contract FHECosmicBaseNFT is ERC721, ERC721URIStorage, Ownable, ZamaEthereumConf
         Ownable(msg.sender)
     {
         _tokenIdCounter = 0;
+        statsInitialized = false;
+    }
+
+    /**
+     * @notice Initialize encrypted stats (called once after deployment)
+     * @dev This is needed because FHE values cannot be initialized in constructor
+     */
+    function initializeStats() external onlyOwner {
+        require(!statsInitialized, "Stats already initialized");
+
+        // Initialize encrypted counters to 0
+        encryptedTotalMints = FHE.asEuint32(0);
+        FHE.allowThis(encryptedTotalMints);
+
+        // Initialize all sign counters to 0
+        for (uint8 i = 0; i < 12; i++) {
+            encryptedSunSignCounts[i] = FHE.asEuint32(0);
+            FHE.allowThis(encryptedSunSignCounts[i]);
+        }
+
+        statsInitialized = true;
     }
 
     /**
@@ -160,6 +189,21 @@ contract FHECosmicBaseNFT is ERC721, ERC721URIStorage, Ownable, ZamaEthereumConf
 
         userToToken[msg.sender] = tokenId;
         hasMinted[msg.sender] = true;
+
+        // Update encrypted aggregate stats using FHE computation
+        if (statsInitialized) {
+            // Increment total mints counter
+            euint32 one = FHE.asEuint32(1);
+            encryptedTotalMints = FHE.add(encryptedTotalMints, one);
+            FHE.allowThis(encryptedTotalMints);
+
+            // Increment sun sign counter (sunSign is 1-12, array is 0-11)
+            uint8 signIndex = _sunSign - 1;
+            encryptedSunSignCounts[signIndex] = FHE.add(encryptedSunSignCounts[signIndex], one);
+            FHE.allowThis(encryptedSunSignCounts[signIndex]);
+
+            emit StatsUpdated(_tokenIdCounter);
+        }
 
         emit ChartMinted(
             msg.sender,
@@ -378,6 +422,35 @@ contract FHECosmicBaseNFT is ERC721, ERC721URIStorage, Ownable, ZamaEthereumConf
         }
 
         return from;
+    }
+
+    /**
+     * @notice Get encrypted total mints counter
+     * @dev Only contract owner can decrypt this value
+     * @return Encrypted total mint count
+     */
+    function getEncryptedTotalMints() external view returns (euint32) {
+        require(statsInitialized, "Stats not initialized");
+        return encryptedTotalMints;
+    }
+
+    /**
+     * @notice Get encrypted count for a specific sun sign
+     * @param signIndex Zodiac sign index (0-11)
+     * @return Encrypted count for that sign
+     */
+    function getEncryptedSignCount(uint8 signIndex) external view returns (euint32) {
+        require(statsInitialized, "Stats not initialized");
+        require(signIndex < 12, "Invalid sign index");
+        return encryptedSunSignCounts[signIndex];
+    }
+
+    /**
+     * @notice Check if stats are initialized
+     * @return bool true if initialized
+     */
+    function areStatsInitialized() external view returns (bool) {
+        return statsInitialized;
     }
 
     // Required overrides

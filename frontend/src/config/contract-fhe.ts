@@ -1,7 +1,7 @@
 import { type Address, type Abi, toHex } from 'viem'
 
 // FHE Contract address - deployed to Sepolia
-export const FHE_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_FHE_CONTRACT_ADDRESS as Address || '0xD0CC51718B89456d33BF14d5019228646838636F' as Address
+export const FHE_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_FHE_CONTRACT_ADDRESS as Address || '0xE37743B10BB6E48436072DE66B516A40335E2632' as Address
 
 // FHE CosmicBase NFT ABI
 export const FHE_CONTRACT_ABI: Abi = [
@@ -244,6 +244,23 @@ export const FHE_CONTRACT_ABI: Abi = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function'
+  },
+  // Stats functions
+  {
+    inputs: [],
+    name: 'areStatsInitialized',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function'
+  },
+  // StatsUpdated event
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'uint256', name: 'totalMints', type: 'uint256' }
+    ],
+    name: 'StatsUpdated',
+    type: 'event'
   }
 ] as const
 

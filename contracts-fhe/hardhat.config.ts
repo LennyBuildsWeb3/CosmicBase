@@ -32,7 +32,9 @@ const config: HardhatUserConfig = {
       chainId: 31337,
     },
     sepolia: {
-      url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
+      url: INFURA_API_KEY
+        ? `https://sepolia.infura.io/v3/${INFURA_API_KEY}`
+        : "https://ethereum-sepolia-rpc.publicnode.com",
       chainId: 11155111,
       accounts: MNEMONIC ? { mnemonic: MNEMONIC } : [],
     },

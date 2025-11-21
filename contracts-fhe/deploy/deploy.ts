@@ -20,6 +20,12 @@ async function main() {
   const contractAddress = await contract.getAddress();
   console.log("FHECosmicBaseNFT deployed to:", contractAddress);
 
+  // Initialize encrypted stats
+  console.log("Initializing encrypted stats...");
+  const initTx = await contract.initializeStats();
+  await initTx.wait();
+  console.log("Stats initialized successfully!");
+
   // Get network info
   const network = await ethers.provider.getNetwork();
   console.log("Network:", network.name, "Chain ID:", network.chainId.toString());
