@@ -10,7 +10,7 @@ A privacy-preserving astrology NFT application built with Zama FHEVM. Users can 
 
 ## Demo Video
 
-[Coming Soon]
+[Watch on YouTube](https://youtu.be/uF8tEFGNJ_8)
 
 ## Features
 
