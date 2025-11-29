@@ -412,13 +412,38 @@ contract FHECosmicBaseNFT is ERC721, ERC721URIStorage, Ownable, ZamaEthereumConf
 
         // Transfer encrypted data access to new owner
         if (from != address(0) && to != address(0) && publicBirthCharts[tokenId].hasEncryptedData) {
-            FHE.allow(encryptedBirthData[tokenId].birthYear, to);
-            FHE.allow(encryptedBirthData[tokenId].birthMonth, to);
-            FHE.allow(encryptedBirthData[tokenId].birthDay, to);
-            FHE.allow(encryptedBirthData[tokenId].birthHour, to);
-            FHE.allow(encryptedBirthData[tokenId].birthMinute, to);
-            FHE.allow(encryptedBirthData[tokenId].latitude, to);
-            FHE.allow(encryptedBirthData[tokenId].longitude, to);
+            EncryptedBirthData storage data = encryptedBirthData[tokenId];
+
+            // Re-encrypt data by adding encrypted zero (re-masking)
+            // This creates new handles that the previous owner cannot decrypt
+            
+            // Year
+            data.birthYear = FHE.add(data.birthYear, FHE.asEuint16(0));
+            FHE.allow(data.birthYear, to);
+            
+            // Month
+            data.birthMonth = FHE.add(data.birthMonth, FHE.asEuint8(0));
+            FHE.allow(data.birthMonth, to);
+            
+            // Day
+            data.birthDay = FHE.add(data.birthDay, FHE.asEuint8(0));
+            FHE.allow(data.birthDay, to);
+            
+            // Hour
+            data.birthHour = FHE.add(data.birthHour, FHE.asEuint8(0));
+            FHE.allow(data.birthHour, to);
+            
+            // Minute
+            data.birthMinute = FHE.add(data.birthMinute, FHE.asEuint8(0));
+            FHE.allow(data.birthMinute, to);
+            
+            // Latitude
+            data.latitude = FHE.add(data.latitude, FHE.asEuint32(0));
+            FHE.allow(data.latitude, to);
+            
+            // Longitude
+            data.longitude = FHE.add(data.longitude, FHE.asEuint32(0));
+            FHE.allow(data.longitude, to);
         }
 
         return from;
