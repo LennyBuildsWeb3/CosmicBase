@@ -244,8 +244,8 @@ export function validateBirthDataForEncryption(data: BirthDataToEncrypt): string
  */
 export function decodeCoordinates(latInt: bigint, longInt: bigint): { latitude: number; longitude: number } {
   return {
-    latitude: Number(latInt) / 10000,
-    longitude: Number(longInt) / 10000,
+    latitude: (Number(latInt) - 900000) / 10000,
+    longitude: (Number(longInt) - 1800000) / 10000,
   }
 }
 

@@ -129,14 +129,6 @@ export const FHE_CONTRACT_ABI: Abi = [
     stateMutability: 'view',
     type: 'function'
   },
-  // Request decryption
-  {
-    inputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }],
-    name: 'requestBirthDataDecryption',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function'
-  },
   // Update metadata URI
   {
     inputs: [
