@@ -200,9 +200,16 @@ Test coverage includes:
 - ERC721 compliance (2 tests)
 - Sign compatibility logic (2 tests)
 - Gas estimation (2 tests)
-- Integration tests (5 tests)
+- FHE integration tests (18 tests)
+  - Full minting flow with encrypted inputs (1 test)
+  - FHE computation and encrypted counters (4 tests)
+  - Access control for encrypted data (4 tests)
+  - NFT transfer and re-encryption (3 tests)
+  - Double minting prevention (2 tests)
+  - Public birth chart data (2 tests)
+  - Metadata updates (2 tests)
 
-Total: 27 passing tests
+Total: 40 passing tests
 
 ## Manual Testing
 
