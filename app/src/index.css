@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --wood: #22c55e;
+  --fire: #ef4444;
+  --earth: #eab308;
+  --metal: #94a3b8;
+  --water: #3b82f6;
+}
+
+body {
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a1025 50%, #0d1117 100%);
+  min-height: 100vh;
+}
+
+/* Starfield background */
+.starfield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+    radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.9), transparent),
+    radial-gradient(1px 1px at 230px 80px, #fff, transparent),
+    radial-gradient(2px 2px at 300px 150px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 350px 200px, #fff, transparent),
+    radial-gradient(2px 2px at 420px 50px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 500px 180px, #fff, transparent),
+    radial-gradient(2px 2px at 580px 90px, rgba(255,255,255,0.9), transparent);
+  background-size: 600px 300px;
+  animation: twinkle 8s ease-in-out infinite;
+  opacity: 0.5;
+  z-index: 0;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+/* Cosmic glow effects */
+.cosmic-glow {
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.3), 0 0 60px rgba(236, 72, 153, 0.2);
+}
+
+.element-wood { color: var(--wood); text-shadow: 0 0 10px var(--wood); }
+.element-fire { color: var(--fire); text-shadow: 0 0 10px var(--fire); }
+.element-earth { color: var(--earth); text-shadow: 0 0 10px var(--earth); }
+.element-metal { color: var(--metal); text-shadow: 0 0 10px var(--metal); }
+.element-water { color: var(--water); text-shadow: 0 0 10px var(--water); }
+
+.card-cosmic {
+  background: linear-gradient(145deg, rgba(30, 20, 50, 0.8), rgba(20, 10, 40, 0.9));
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.btn-cosmic {
+  background: linear-gradient(135deg, #7c3aed, #db2777);
+  transition: all 0.3s ease;
+}
+
+.btn-cosmic:hover {
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Chinese character styling */
+.hanzi {
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* Zodiac symbol glow */
+.zodiac-symbol {
+  filter: drop-shadow(0 0 8px currentColor);
+}

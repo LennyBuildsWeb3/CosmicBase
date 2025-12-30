@@ -1,56 +1,36 @@
 # Dependencies
 node_modules/
-.pnp
-.pnp.js
 
-# Testing
-coverage/
-.nyc_output
-
-# Next.js
-.next/
-out/
-build/
-dist/
-
-# Environment variables
+# Environment files
 .env
-.env*.local
-contracts-fhe/.env
-frontend/.env.local
+.env.local
+.env.*.local
 
-# Hardhat
-cache/
-artifacts/
-typechain-types/
-deployments/
+# Build outputs
+dist/
+build/
+
+# Docs
+docs/
+v1_files/
+
+# Logs
+*.log
+npm-debug.log*
 
 # IDE
-.vscode/
 .idea/
+.vscode/
 *.swp
 *.swo
-*~
-.claude/
 
 # OS
 .DS_Store
 Thumbs.db
-nul
 
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Hardhat
+cache/
+artifacts/
 
 # Misc
-.vercel
-*.tsbuildinfo
-.eslintcache
-
-# Keep example env files
-!.env.example
-!contracts-fhe/.env.example
-!frontend/.env.example
+*.local

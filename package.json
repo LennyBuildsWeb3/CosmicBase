@@ -1,28 +1,26 @@
 {
-  "name": "cosmicbase",
+  "name": "coscmicbase",
   "version": "1.0.0",
-  "description": "CosmicBase - Onchain Astrology Profile Platform on Base",
-  "private": true,
-  "workspaces": [
-    "contracts",
-    "frontend"
-  ],
-  "scripts": {
-    "contracts": "npm run --workspace=contracts",
-    "frontend": "npm run dev --workspace=frontend",
-    "dev": "npm run frontend",
-    "build:contracts": "npm run compile --workspace=contracts",
-    "test:contracts": "npm run test --workspace=contracts",
-    "deploy:testnet": "npm run deploy:sepolia --workspace=contracts"
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
   },
-  "keywords": [
-    "astrology",
-    "blockchain",
-    "base",
-    "nft",
-    "birth-chart",
-    "web3"
-  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
   "author": "",
-  "license": "MIT"
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@openzeppelin/contracts": "^5.4.0",
+    "hardhat": "^3.1.2"
+  },
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "ethers": "^6.16.0",
+    "solc": "^0.8.19"
+  }
 }
