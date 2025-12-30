@@ -2,11 +2,11 @@
 
 **Eastern Saju meets Western Astrology on Web3**
 
-🌐 **Live:** [cosmicbase.app](https://cosmicbase.app)
+**Live:** [cosmicbase.app](https://cosmicbase.app)
 **video**[YouTube](https://youtu.be/vEx-0TydYJs)
 ---
 
-## ✨ What is CosmicBase?
+## What is CosmicBase?
 
 CosmicBase is a privacy-first astrology platform that combines Korean Four Pillars (四柱 Saju) with Western Zodiac, built on Very Network. Discover your unique cosmic profile and mint it as an NFT.
 
@@ -43,11 +43,11 @@ CosmicBase is a privacy-first astrology platform that combines Korean Four Pilla
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Clone
-git clone https://github.com/your-repo/cosmicbase.git
+git clone https://github.com/LennyBuildsWeb3/cosmicbase.git
 cd cosmicbase/app
 
 # Install
