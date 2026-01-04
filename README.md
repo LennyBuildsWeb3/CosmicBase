@@ -105,7 +105,9 @@ VITE_WEPIN_APP_KEY=your-wepin-app-key
 
 ## 📄 License
 
-MIT
+This project is licensed under the Apache License 2.0.
+
+Copyright © 2025 lennyBuildsWeb3
 
 ---
 
