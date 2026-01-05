@@ -6,7 +6,7 @@
 ## 🔗 Links
 - **Live Demo:** https://cosmicbase.app
 - **Smart Contract:** [0xbE6962010697f1B914166209a0E5B18A56bf5708](https://veryscan.io/address/0xbE6962010697f1B914166209a0E5B18A56bf5708)
-- **GitHub:** https://github.com/your-repo/cosmicbase
+- **GitHub:** https://github.com/LennyBuildsWeb3/CosmicBase
 
 ---
 
